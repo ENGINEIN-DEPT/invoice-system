@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מעקב ואישור חשבונות מחלקת הנדסה</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:#0f1e3c; --navy-mid:#162d5a; --navy-light:#1e3d7a;
+  --gold:#c9a84c; --gold-light:#e8c96a; --gold-pale:#fdf6e3;
+  --white:#ffffff; --gray-50:#f8faff; --gray-100:#f0f4fb;
+  --gray-200:#e2e8f4; --gray-300:#c8d2e8; --gray-400:#8a96b0; --gray-600:#4a5470;
+  --text:#1a2340; --error:#d94040; --success:#2a9d5c; --warning:#e07a1a;
+  --sidebar-w:260px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Heebo',sans-serif;background:var(--gray-50);color:var(--text);display:flex;min-height:100vh;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--navy);min-height:100vh;display:flex;flex-direction:column;position:fixed;right:0;top:0;bottom:0;z-index:100;box-shadow:-4px 0 20px rgba(0,0,0,.15);}
+.sidebar-logo{padding:28px 24px 24px;border-bottom:1px solid rgba(255,255,255,.07);}
+.logo-mark{width:42px;height:42px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 4px 14px rgba(201,168,76,.25);}
+.logo-mark svg{width:22px;height:22px;fill:var(--navy);}
+.sidebar-logo h2{font-size:15px;font-weight:800;color:var(--white);}
+.sidebar-logo p{font-size:11px;color:rgba(255,255,255,.35);margin-top:2px;}
+.nav-section{padding:20px 16px 8px;flex:1;overflow-y:auto;}
+.nav-label{font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.25);text-transform:uppercase;padding:0 8px;margin-bottom:8px;margin-top:16px;}
+.nav-label:first-child{margin-top:0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:14px;font-weight:500;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s;text-decoration:none;margin-bottom:2px;}
+.nav-item svg{width:18px;height:18px;flex-shrink:0;}
+.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+.nav-item.active{background:rgba(201,168,76,.15);color:var(--gold);}
+.nav-badge{margin-right:auto;background:var(--gold);color:var(--navy);font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;}
+.sidebar-user{padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);display:flex;align-items:center;gap:10px;}
+.user-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border:2px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--gold);flex-shrink:0;}
+.user-info .name{font-size:13px;font-weight:600;color:var(--white);}
+.user-info .role{font-size:11px;color:rgba(255,255,255,.35);}
+.logout-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.3);padding:4px;border-radius:6px;transition:color .2s;}
+.logout-btn:hover{color:rgba(255,255,255,.7);}
+
+/* MAIN */
+.main-content{margin-right:var(--sidebar-w);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{background:var(--white);border-bottom:1px solid var(--gray-200);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+.topbar-title h1{font-size:20px;font-weight:800;color:var(--text);}
+.topbar-title p{font-size:12px;color:var(--gray-400);}
+.topbar-actions{display:flex;gap:10px;align-items:center;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-family:'Heebo',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:none;}
+.btn svg{width:16px;height:16px;}
+.btn-primary{background:var(--navy);color:var(--white);}
+.btn-primary:hover{background:var(--navy-light);}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--navy);}
+.btn-gold:hover{box-shadow:0 4px 14px rgba(201,168,76,.35);transform:translateY(-1px);}
+.btn-outline{background:var(--white);color:var(--text);border:1.5px solid var(--gray-200);}
+.btn-outline:hover{border-color:var(--gray-300);background:var(--gray-50);}
+.btn-sm{padding:6px 14px;font-size:13px;}
+.page-body{padding:28px 32px;flex:1;}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.stat-card{background:var(--white);border-radius:12px;padding:20px 22px;border:1px solid var(--gray-200);position:relative;overflow:hidden;}
+.stat-card::after{content:'';position:absolute;top:0;right:0;width:4px;height:100%;background:var(--gold);border-radius:0 12px 12px 0;}
+.stat-card.blue::after{background:var(--navy-light);}
+.stat-card.green::after{background:var(--success);}
+.stat-card.warn::after{background:var(--warning);}
+.stat-label{font-size:12px;color:var(--gray-400);font-weight:500;margin-bottom:6px;}
+.stat-value{font-size:26px;font-weight:800;color:var(--text);}
+.stat-sub{font-size:12px;color:var(--gray-400);margin-top:4px;}
+
+/* PROJECTS */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;}
+.project-card{background:var(--white);border-radius:14px;border:1px solid var(--gray-200);overflow:hidden;cursor:pointer;transition:all .2s;}
+.project-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.08);transform:translateY(-2px);border-color:var(--gray-300);}
+.project-card-header{padding:18px 20px 14px;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);position:relative;}
+.project-card-header h3{font-size:16px;font-weight:700;color:var(--white);}
+.project-card-header p{font-size:12px;color:rgba(255,255,255,.45);margin-top:3px;}
+.project-status{position:absolute;top:16px;left:16px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.status-active{background:rgba(42,157,92,.2);color:#4ade80;border:1px solid rgba(42,157,92,.3);}
+.status-pending-proj{background:rgba(224,122,26,.2);color:#fbbf24;border:1px solid rgba(224,122,26,.3);}
+.project-card-body{padding:16px 20px;}
+.project-meta{display:flex;gap:16px;margin-bottom:14px;}
+.meta-item{font-size:12px;color:var(--gray-400);}
+.meta-item strong{display:block;font-size:14px;font-weight:700;color:var(--text);}
+.progress-bar{height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px;transition:width .8s ease;}
+.project-card-footer{padding:12px 20px;border-top:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between;}
+
+/* VENDORS */
+.back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--gray-600);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:'Heebo',sans-serif;padding:0;transition:color .2s;}
+.back-btn:hover{color:var(--text);}
+.back-btn svg{width:16px;height:16px;}
+.project-detail-header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);border-radius:14px;padding:24px 28px;margin-bottom:24px;color:var(--white);display:flex;align-items:center;justify-content:space-between;}
+.vendors-list{display:flex;flex-direction:column;gap:12px;}
+.vendor-card{background:var(--white);border-radius:12px;border:1px solid var(--gray-200);overflow:hidden;cursor:pointer;transition:all .2s;}
+.vendor-card:hover{box-shadow:0 4px 18px rgba(0,0,0,.06);border-color:var(--gray-300);}
+.vendor-card-inner{display:flex;align-items:center;padding:16px 20px;gap:16px;}
+.vendor-icon{width:44px;height:44px;border-radius:10px;background:var(--gold-pale);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.vendor-icon svg{width:20px;height:20px;color:var(--gold);}
+.vendor-info{flex:1;min-width:0;}
+.vendor-info h4{font-size:15px;font-weight:700;color:var(--text);}
+.vendor-info p{font-size:12px;color:var(--gray-400);margin-top:2px;}
+.vendor-amounts{text-align:left;}
+.vendor-total{font-size:16px;font-weight:800;color:var(--text);}
+.vendor-paid{font-size:12px;color:var(--success);font-weight:600;}
+
+/* INVOICES TABLE */
+.invoices-table{width:100%;border-collapse:separate;border-spacing:0 6px;}
+.invoices-table th{text-align:right;font-size:12px;font-weight:600;color:var(--gray-400);padding:8px 16px;}
+.invoices-table td{padding:12px 16px;background:var(--white);font-size:14px;}
+.invoices-table td:first-child{border-radius:10px 0 0 10px;}
+.invoices-table td:last-child{border-radius:0 10px 10px 0;}
+.invoice-row{transition:all .15s;cursor:pointer;}
+.invoice-row:hover td{background:var(--gray-50);}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+.badge-pending{background:rgba(224,122,26,.1);color:var(--warning);}
+.badge-inprogress{background:rgba(30,61,122,.1);color:var(--navy-light);}
+.badge-done{background:rgba(42,157,92,.1);color:var(--success);}
+.badge-step{background:rgba(201,168,76,.15);color:#7a5c00;}
+
+/* APPROVAL CHAIN TIMELINE */
+.chain-wrapper{display:flex;align-items:flex-start;gap:0;padding:24px 28px;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;margin-bottom:20px;overflow-x:auto;}
+.chain-step{display:flex;flex-direction:column;align-items:center;flex:1;min-width:140px;position:relative;}
+.chain-step:not(:last-child)::after{content:'';position:absolute;top:20px;left:0;width:100%;height:2px;background:var(--gray-200);z-index:0;}
+.chain-step.cs-done:not(:last-child)::after{background:var(--success);}
+.chain-step.cs-active:not(:last-child)::after{background:linear-gradient(90deg,var(--gold),var(--gray-200));}
+.chain-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;position:relative;z-index:1;border:2px solid var(--gray-200);background:var(--white);transition:all .3s;}
+.cs-done .chain-icon{background:var(--success);border-color:var(--success);color:var(--white);font-size:18px;}
+.cs-active .chain-icon{background:var(--gold);border-color:var(--gold);color:var(--navy);box-shadow:0 0 0 5px rgba(201,168,76,.2);}
+.cs-pending .chain-icon{background:var(--gray-100);color:var(--gray-400);}
+.chain-label{font-size:12px;font-weight:700;color:var(--text);margin-top:10px;text-align:center;}
+.chain-sublabel{font-size:11px;color:var(--gray-400);margin-top:3px;text-align:center;}
+.chain-date{font-size:10px;color:var(--success);margin-top:2px;font-weight:600;}
+
+/* EMAIL PANEL */
+.email-panel{background:linear-gradient(135deg,#f0f7ff,#e8f4fd);border:1px solid #c3daf5;border-radius:10px;padding:14px 16px;margin-top:16px;}
+.ep-hdr{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ep-hdr svg{color:#1a73e8;}
+.ep-hdr span{font-size:14px;font-weight:700;color:#1a3a5c;}
+.email-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;}
+.eb-gmail{background:#fff3f3;border:1px solid #fcc;color:#d93025;}
+.eb-info{background:#e8f4fd;border:1px solid #c3daf5;color:#1a73e8;}
+.eb-sent{background:#e6f9f0;border:1px solid #a8dfc3;color:#1a7a4a;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,16,35,.6);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:16px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.3);animation:modalIn .25s ease both;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-header{padding:24px 28px 20px;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;justify-content:space-between;}
+.modal-header h3{font-size:18px;font-weight:800;}
+.modal-close{background:var(--gray-100);border:none;border-radius:8px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--gray-600);transition:all .15s;}
+.modal-close:hover{background:var(--gray-200);}
+.modal-body{padding:24px 28px;}
+.modal-footer{padding:16px 28px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:10px;}
+.form-row-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.field-group{margin-bottom:18px;}
+.field-group label{display:block;font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px;}
+.field-input{width:100%;padding:10px 14px;font-family:'Heebo',sans-serif;font-size:14px;color:var(--text);background:var(--gray-50);border:1.5px solid var(--gray-200);border-radius:8px;outline:none;transition:all .2s;direction:rtl;}
+.field-input:focus{background:var(--white);border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.1);}
+.field-input::placeholder{color:var(--gray-400);}
+select.field-input{cursor:pointer;}
+
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--gray-300);border-radius:10px;padding:28px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--gray-50);}
+.upload-zone:hover{border-color:var(--gold);background:var(--gold-pale);}
+.upload-zone.has-file{border-color:var(--success);background:rgba(42,157,92,.04);}
+
+/* SIGNATURE */
+.sig-wrapper{border:2px dashed var(--gray-200);border-radius:10px;background:var(--gray-50);overflow:hidden;margin-bottom:12px;position:relative;}
+.sig-wrapper canvas{display:block;cursor:crosshair;}
+.sig-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:.4;font-size:14px;color:var(--gray-400);}
+
+/* MILESTONE */
+.milestone-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--gray-50);border-radius:8px;margin-bottom:8px;}
+.ms-num{width:24px;height:24px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--navy);color:var(--white);padding:12px 24px;border-radius:10px;font-size:14px;font-weight:500;z-index:999;transition:transform .3s ease;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{background:var(--error);}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 17h8v1.5H8V17zm0-3.5h8V15H8v-1.5zm0-3.5h4v1.5H8V10z"/></svg></div>
+    <h2 style="font-size:13px;line-height:1.35">מעקב ואישור חשבונות<br>מחלקת הנדסה</h2><p>ניהול ספקים וחשבונות</p>
+  </div>
+  <nav class="nav-section">
+    <div class="nav-label">ראשי</div>
+    <a class="nav-item active" onclick="showView('projects')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>לוח בקרה</a>
+    <a class="nav-item" onclick="showView('pending-approvals')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>ממתין לאישורי<span class="nav-badge" id="pendingCount">0</span></a>
+    <div class="nav-label">ניהול</div>
+    <a class="nav-item" onclick="showView('reports')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>דוחות ומעקב</a>
+    <a class="nav-item" onclick="showView('settings')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.22-.07.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>הגדרות שרשרת</a>
+  </nav>
+  <div style="padding:10px 20px;border-top:1px solid rgba(255,255,255,.05)">
+    <div id="syncBadge" style="text-align:center;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;background:#162d5a;color:#aac;transition:all .4s">
+      ☁ לא מחובר לגיליון
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="userAvatar">מ</div>
+    <div class="user-info"><div class="name" id="userName">מנהל מערכת</div><div class="role" id="userRole">Admin</div></div>
+    <button class="logout-btn" onclick="logout()"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></svg></button>
+  </div>
+</aside>
+
+<main class="main-content">
+
+  <!-- PROJECTS -->
+  <div id="view-projects">
+    <div class="topbar">
+      <div class="topbar-title"><h1>פרויקטים</h1><p>ניהול ספקים וחשבונות לפי פרויקט</p></div>
+      <div class="topbar-actions"><button class="btn btn-gold" onclick="openModal('modalProject')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>פרויקט חדש</button></div>
+    </div>
+    <div class="page-body">
+      <div class="stats-row">
+        <div class="stat-card blue" onclick="showView('projects')" style="cursor:pointer" title="לחץ לפתיחת רשימת הפרויקטים"><div class="stat-label">פרויקטים פעילים</div><div class="stat-value" id="sProjects">0</div><div class="stat-sub" style="color:var(--gold);font-weight:600;margin-top:6px">← לחץ לרשימה</div></div>
+        <div class="stat-card" onclick="showView('projects')" style="cursor:pointer" title="לחץ לפתיחת רשימת הפרויקטים"><div class="stat-label">סה"כ ספקים</div><div class="stat-value" id="sVendors">0</div><div class="stat-sub" style="color:var(--gold);font-weight:600;margin-top:6px">← לחץ לרשימה</div></div>
+        <div class="stat-card green" onclick="showView('projects')" style="cursor:pointer" title="לחץ לפתיחת רשימת הפרויקטים"><div class="stat-label">חשבונות פתוחים</div><div class="stat-value" id="sInvoices">0</div><div class="stat-sub" style="color:var(--gold);font-weight:600;margin-top:6px">← לחץ לרשימה</div></div>
+        <div class="stat-card warn" onclick="showView('pending-approvals')" style="cursor:pointer" title="לחץ לחשבונות הממתינים"><div class="stat-label">ממתין לחתימה</div><div class="stat-value" id="sPending">0</div><div class="stat-sub" style="color:var(--warning);font-weight:600;margin-top:6px">← לחץ לאישור</div></div>
+      </div>
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:20px">כל הפרויקטים</h2>
+      <div class="projects-grid" id="projectsGrid"></div>
+    </div>
+  </div>
+
+  <!-- VENDORS -->
+  <div id="view-vendors" style="display:none">
+    <div class="topbar">
+      <div class="topbar-title"><h1 id="vendorsTitle">ספקים</h1><p id="vendorsSubtitle"></p></div>
+      <div class="topbar-actions"><button class="btn btn-gold" onclick="openModal('modalVendor')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>ספק חדש</button></div>
+    </div>
+    <div class="page-body">
+      <button class="back-btn" onclick="showView('projects')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>חזרה לפרויקטים</button>
+      <div class="project-detail-header">
+        <div><h2 id="projDetailName" style="font-size:20px;font-weight:800"></h2><p id="projDetailDesc" style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px"></p></div>
+        <div style="text-align:left"><div style="font-size:22px;font-weight:800;color:var(--gold)" id="projDetailBudget">₪0</div><div style="font-size:12px;color:rgba(255,255,255,.4)">סה"כ חוזים</div></div>
+      </div>
+      <div class="vendors-list" id="vendorsList" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px"></div>
+    </div>
+  </div>
+
+  <!-- INVOICES LIST -->
+  <div id="view-invoices" style="display:none">
+    <div class="topbar">
+      <div class="topbar-title"><h1 id="invListTitle">חשבונות</h1><p id="invListSubtitle"></p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="showView('vendors')"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>חזרה</button>
+        <button class="btn btn-gold" onclick="openModal('modalInvoice')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>חשבון חדש</button>
+      </div>
+    </div>
+    <div class="page-body">
+      <div id="contractSummary" style="background:var(--white);border-radius:12px;border:1px solid var(--gray-200);padding:20px 24px;margin-bottom:24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center"></div>
+      <div id="milestonesSection" style="display:none;margin-bottom:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">אבני דרך לתשלום</h3>
+        <div id="milestonesList"></div>
+      </div>
+      <div id="invMatrixSection" style="display:none"></div>
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">חשבונות מפורטים</h2>
+      <div style="background:var(--white);border-radius:12px;border:1px solid var(--gray-200);overflow:hidden">
+        <table class="invoices-table"><thead><tr><th>חשבון</th><th>חודש</th><th>סכום מוגש</th><th>סכום מאושר</th><th>שלב נוכחי</th><th>סטטוס</th><th></th></tr></thead>
+        <tbody id="invTableBody"></tbody></table>
+        <div id="noInvoices" style="padding:40px;text-align:center;color:var(--gray-400);display:none"><p>אין חשבונות עדיין.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVOICE DETAIL -->
+  <div id="view-invoice-detail" style="display:none">
+    <div class="topbar">
+      <div class="topbar-title"><h1 id="invDetailTitle">פרטי חשבון</h1><p id="invDetailSub"></p></div>
+      <div class="topbar-actions">
+        <button class="btn btn-outline btn-sm" onclick="showView('invoices')"><svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>חזרה</button>
+        <button class="btn btn-gold" id="mainSignBtn" onclick="openSignModal()"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>חתום על חשבון זה</button>
+      </div>
+    </div>
+    <div class="page-body"><div id="invDetailBody"></div></div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="view-reports" style="display:none">
+    <div class="topbar"><div class="topbar-title"><h1>דוחות ומעקב</h1><p>תשלומים מצטברים לפי ספקים</p></div></div>
+    <div class="page-body"><div id="reportsContent"></div></div>
+  </div>
+
+  <!-- PENDING -->
+  <div id="view-pending-approvals" style="display:none">
+    <div class="topbar"><div class="topbar-title"><h1>ממתין לאישורי</h1><p>חשבונות הממתינים לחתימתך</p></div></div>
+    <div class="page-body"><div id="pendingList"></div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="view-settings" style="display:none">
+    <div class="topbar">
+      <div class="topbar-title"><h1>הגדרות מערכת</h1><p>שרשרת אישורים · מאגר משתמשים · מייל</p></div>
+      <div class="topbar-actions"><button class="btn btn-gold" onclick="saveSettings()">💾 שמור הכל</button></div>
+    </div>
+    <div class="page-body" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+      <!-- LEFT: Chain editor -->
+      <div style="background:var(--white);border-radius:14px;border:1px solid var(--gray-200);padding:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">🔗 שרשרת אישורים</h3>
+        <p style="font-size:12px;color:var(--gray-400);margin-bottom:20px">גרור לשינוי סדר · הוסף מהמאגר · הסר לפי הצורך</p>
+        <div id="chainEditorList"></div>
+        <div style="margin-top:14px;padding:12px;background:var(--gray-50);border-radius:10px;border:1px dashed var(--gray-300)">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:8px">הוסף חותם מהמאגר:</div>
+          <div style="display:flex;gap:8px">
+            <select class="field-input" id="addChainUser" style="flex:1;padding:8px 12px;font-size:13px">
+              <option value="">— בחר משתמש —</option>
+            </select>
+            <button class="btn btn-sm btn-primary" onclick="addToChain()">+ הוסף</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: User pool -->
+      <div style="background:var(--white);border-radius:14px;border:1px solid var(--gray-200);padding:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">👥 מאגר משתמשים</h3>
+        <p style="font-size:12px;color:var(--gray-400);margin-bottom:16px">כל בעלי הגישה שניתן להוסיף לשרשרת</p>
+        <div id="userPoolList"></div>
+        <div style="margin-top:14px;padding:14px;background:var(--gray-50);border-radius:10px;border:1px dashed var(--gray-300)">
+          <div style="font-size:12px;font-weight:600;color:var(--gray-600);margin-bottom:10px">הוסף משתמש חדש:</div>
+          <div class="field-group" style="margin-bottom:10px"><input class="field-input" id="fUserName" placeholder="שם מלא *" /></div>
+          <div class="form-row-grid" style="margin-bottom:10px">
+            <input class="field-input" id="fUserRole" placeholder="תפקיד" />
+            <input class="field-input" id="fUserEmail" placeholder="כתובת מייל *" type="email" style="direction:ltr" />
+          </div>
+          <button class="btn btn-sm btn-primary" onclick="addUser()" style="width:100%">+ הוסף למאגר</button>
+        </div>
+      </div>
+
+      <!-- BOTTOM: Email provider (full width) -->
+      <div style="background:var(--white);border-radius:14px;border:1px solid var(--gray-200);padding:24px;grid-column:1/-1">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">📬 ספק שליחת מייל</h3>
+        <div id="emailProviderSection"></div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- MODALS -->
+
+<!-- New Project -->
+<div class="modal-overlay" id="modalProject">
+  <div class="modal">
+    <div class="modal-header"><h3>פרויקט חדש</h3><button class="modal-close" onclick="closeModal('modalProject')">✕</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label>שם הפרויקט *</label><input class="field-input" id="fProjName" placeholder="שם הפרויקט" /></div>
+      <div class="field-group"><label>תיאור</label><input class="field-input" id="fProjDesc" placeholder="תיאור קצר" /></div>
+      <div class="field-group">
+        <label>עיר / אזור *</label>
+        <select class="field-input" id="fProjCity">
+          <option value="">— בחר עיר —</option>
+        </select>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <input class="field-input" id="fNewCity" placeholder="הוסף עיר חדשה..." style="flex:1" />
+          <button class="btn btn-sm btn-outline" onclick="addNewCity()" style="white-space:nowrap">+ הוסף</button>
+        </div>
+      </div>
+      <div class="form-row-grid">
+        <div class="field-group"><label>תאריך התחלה</label><input type="date" class="field-input" id="fProjStart" /></div>
+        <div class="field-group"><label>תאריך סיום</label><input type="date" class="field-input" id="fProjEnd" /></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalProject')">ביטול</button><button class="btn btn-primary" onclick="createProject()">צור פרויקט</button></div>
+  </div>
+</div>
+
+<!-- New Vendor -->
+<div class="modal-overlay" id="modalVendor">
+  <div class="modal" style="width:620px">
+    <div class="modal-header"><h3>ספק / נותן שירות חדש</h3><button class="modal-close" onclick="closeModal('modalVendor')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-row-grid">
+        <div class="field-group"><label>שם הספק *</label><input class="field-input" id="fVName" placeholder="שם הספק" /></div>
+        <div class="field-group"><label>תחום *</label><input class="field-input" id="fVDomain" placeholder="ביצוע / ייעוץ / אחר" /></div>
+      </div>
+      <div class="form-row-grid">
+        <div class="field-group"><label>ח.פ / עוסק מורשה *</label><input class="field-input" id="fVTax" placeholder="מספר עוסק" /></div>
+        <div class="field-group"><label>סכום הסכם (₪) *</label><input type="number" class="field-input" id="fVAmount" placeholder="0" /></div>
+      </div>
+
+      <!-- מדד הסכם — מורחב -->
+      <div class="field-group">
+        <label>הצמדה למדד</label>
+        <select class="field-input" id="fVIndex" onchange="onIndexTypeChange()">
+          <option value="none">לא מוצמד</option>
+          <option value="cpi">מוצמד — מדד מחירים לצרכן (CPI)</option>
+          <option value="construction">מוצמד — מדד תשומות הבניה</option>
+        </select>
+      </div>
+      <div id="indexDetailsGroup" style="display:none">
+        <div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,.2);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:700;color:#7a5c00;margin-bottom:10px">📈 פרטי מדד הסכם</div>
+          <div class="form-row-grid">
+            <div class="field-group" style="margin-bottom:0">
+              <label>ערך המדד בחתימה</label>
+              <input type="number" step="0.01" class="field-input" id="fVIndexVal" placeholder="לדוגמה: 120.5" />
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label>חודש המדד הבסיסי</label>
+              <select class="field-input" id="fVIndexMonth">
+                <option value="">— בחר חודש —</option>
+                <option>ינואר 25</option><option>פברואר 25</option><option>מרץ 25</option><option>אפריל 25</option>
+                <option>מאי 25</option><option>יוני 25</option><option>יולי 25</option><option>אוגוסט 25</option>
+                <option>ספטמבר 25</option><option>אוקטובר 25</option><option>נובמבר 25</option><option>דצמבר 25</option>
+                <option>ינואר 26</option><option>פברואר 26</option><option>מרץ 26</option><option>אפריל 26</option>
+                <option>מאי 26</option><option>יוני 26</option><option>יולי 26</option><option>אוגוסט 26</option>
+                <option>ספטמבר 26</option><option>אוקטובר 26</option><option>נובמבר 26</option><option>דצמבר 26</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label>אבני דרך לתשלום</label>
+        <div id="msInputs">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input class="field-input" style="flex:2" id="ms0d" placeholder="תיאור" />
+            <input type="number" class="field-input" style="flex:1" id="ms0a" placeholder="₪" />
+            <button class="btn btn-sm btn-outline" onclick="addMs()" style="padding:8px 10px">+</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--gray-400)">השאירו ריק אם אין אבני דרך</p>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalVendor')">ביטול</button><button class="btn btn-primary" onclick="createVendor()">פתח כרטיסיית ספק</button></div>
+  </div>
+</div>
+
+<!-- New Invoice -->
+<div class="modal-overlay" id="modalInvoice">
+  <div class="modal" style="width:640px;max-height:92vh">
+    <div class="modal-header">
+      <h3>העלאת חשבון חדש</h3>
+      <button class="modal-close" onclick="closeModal('modalInvoice')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Basic fields -->
+      <div class="form-row-grid">
+        <div class="field-group"><label>מספר חשבון</label><input class="field-input" id="fInvNum" placeholder="01" /></div>
+        <div class="field-group"><label>חודש</label>
+          <select class="field-input" id="fInvMonth">
+            <option>ינואר 26</option><option>פברואר 26</option><option>מרץ 26</option><option>אפריל 26</option>
+            <option>מאי 26</option><option>יוני 26</option><option>יולי 26</option><option>אוגוסט 26</option>
+            <option>ספטמבר 26</option><option>אוקטובר 26</option><option>נובמבר 26</option><option>דצמבר 26</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-grid">
+        <div class="field-group"><label>סכום שהוגש (₪)</label><input type="number" class="field-input" id="fInvSubmit" placeholder="0" /></div>
+        <div class="field-group"><label>סכום מאושר (₪)</label><input type="number" class="field-input" id="fInvApprove" placeholder="0" /></div>
+      </div>
+
+      <!-- File upload -->
+      <div class="field-group">
+        <label>קובץ החשבון</label>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:32px;height:32px;color:var(--gray-300);margin-bottom:8px"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+          <p style="font-size:14px;color:var(--gray-600)">לחצו לבחירת קובץ</p>
+          <span style="font-size:11px;color:var(--gray-400)">PDF, JPG, PNG, DOCX עד 20MB</span>
+        </div>
+        <input type="file" id="fileInput" style="display:none" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onchange="handleFile(this)" />
+      </div>
+
+      <!-- ===== DYNAMIC CHAIN BUILDER ===== -->
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:12px;padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="font-size:14px;font-weight:700">🔗 שרשרת אישורים לחשבון זה</div>
+            <div style="font-size:11px;color:var(--gray-400);margin-top:2px">בחר את החותמים ואת הסדר</div>
+          </div>
+          <button class="btn btn-sm btn-outline" onclick="resetInvChainToDefault()" style="font-size:11px">↺ ברירת מחדל</button>
+        </div>
+
+        <!-- Current invoice chain -->
+        <div id="invChainList" style="margin-bottom:12px"></div>
+
+        <!-- Add signer -->
+        <div style="display:flex;gap:8px;align-items:center;padding:10px;background:var(--white);border-radius:8px;border:1px dashed var(--gray-300)">
+          <select class="field-input" id="invChainAddUser" style="flex:1;padding:8px 10px;font-size:13px">
+            <option value="">+ הוסף חותם מהמאגר</option>
+          </select>
+          <button class="btn btn-sm btn-primary" onclick="addInvChainStep()">הוסף</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalInvoice')">ביטול</button>
+      <button class="btn btn-primary" onclick="createInvoice()">העלה ושלח לאישור</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sign Modal -->
+<div class="modal-overlay" id="modalSign">
+  <div class="modal" style="width:540px">
+    <div class="modal-header">
+      <div><h3>חתימה דיגיטלית</h3><p style="font-size:12px;color:var(--gray-400);margin-top:2px" id="signSubtitle"></p></div>
+      <button class="modal-close" onclick="closeModal('modalSign')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,.25);border-radius:8px;padding:12px 16px;margin-bottom:18px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px" id="signStepLabel"></div>
+        <div style="font-size:12px;color:var(--gray-600)" id="signStepDesc"></div>
+      </div>
+      <div class="sig-wrapper">
+        <canvas id="sigCanvas" width="480" height="155"></canvas>
+        <div class="sig-placeholder" id="sigPlaceholder">חתמו כאן...</div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+        <button class="btn btn-outline btn-sm" onclick="clearSig()">נקה חתימה</button>
+      </div>
+      <div class="field-group">
+        <label>או העלו תמונת חתימה שמורה</label>
+        <input type="file" class="field-input" accept="image/*" onchange="loadSigImg(this)" style="padding:8px" />
+      </div>
+      <!-- Email notification -->
+      <div class="email-panel" id="emailPanel">
+        <div class="ep-hdr">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          <span>התראת מייל אוטומטית</span>
+        </div>
+        <p style="font-size:13px;color:#2d6da3;margin-bottom:10px" id="emailPanelInfo"></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="email-badge eb-gmail" id="emailProviderBadge"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg> Gmail MCP</span>
+          <span class="email-badge eb-info" id="emailRecipient"></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalSign')">ביטול</button>
+      <button class="btn btn-gold" onclick="confirmSign()">✅ אשר וחתום — שלח מייל</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email Sending Modal -->
+<div class="modal-overlay" id="modalEmail">
+  <div class="modal" style="width:460px">
+    <div class="modal-header"><h3>שליחת התראת מייל</h3><button class="modal-close" onclick="closeModal('modalEmail')">✕</button></div>
+    <div class="modal-body" id="emailModalBody" style="text-align:center;padding:32px 28px">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#4285f4,#34a853);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      </div>
+      <p id="emailModalTitle" style="font-size:17px;font-weight:800;margin-bottom:8px">שולח מייל...</p>
+      <p id="emailModalDesc" style="font-size:13px;color:var(--gray-600)"></p>
+    </div>
+    <div class="modal-footer" id="emailModalFooter" style="display:none"><button class="btn btn-primary" onclick="closeModal('modalEmail')">סגור</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastText"></span></div>
+
+<script>
+// ========== CHAIN CONFIG ==========
+const CHAIN = [
+  { id:'pm',      label:'מנהל פרויקט',    icon:'👷', email:'pm@company.com',      name:'מנהל הפרויקט' },
+  { id:'vp',      label:'סמנכ״ל הנדסה',  icon:'🏗️', email:'vp@company.com',      name:'סמנכ״ל הנדסה' },
+  { id:'finance', label:'חשבת החשבונות', icon:'💼', email:'finance@company.com',  name:'חשבת החשבונות' },
+];
+
+// Email provider: 'gmail' | 'outlook'
+let EMAIL_PROVIDER = 'gmail';
+const GMAIL_MCP_URL   = 'https://gmail.mcp.claude.com/mcp';
+const OUTLOOK_MCP_URL = 'https://outlook.mcp.claude.com/mcp';
+
+// ========== STATE ==========
+let S = {
+  projId: null, vendorId: null, invoiceId: null,
+  msCount: 1,
+  sig: { canvas: null, ctx: null, drawing: false },
+  user: { name:'מנהל מערכת', email:'admin@company.com' },
+  projects: [
+    {
+      id:'1', name:'פרויקט בנייה א׳', desc:'בניין מגורים - 24 יח״ד', status:'active', city:'תל אביב',
+      vendors:[
+        {
+          id:'v1', name:'חברת יפה בנייה בע״מ', domain:'קבלן ביצוע', taxId:'514123456',
+          amount:1500000, indexType:'construction', indexBase:120.5, indexMonth:'ינואר 26',
+          milestones:[{desc:'יציקת יסודות',amount:300000},{desc:'קומת קרקע',amount:400000},{desc:'קומות עליונות',amount:500000}],
+          invoices:[
+            {
+              id:'i1', number:'01', month:'ינואר 26', submitted:120000, approved:118000, file:'חשבון_01.pdf',
+              currentStep:3, invoiceStatus:'approved', comments:[],
+              chain:[
+                {status:'done',  signedAt:'05/01/26 10:22', signerName:'ישראל כהן'},
+                {status:'done',  signedAt:'06/01/26 14:10', signerName:'רחל לוי'},
+                {status:'done',  signedAt:'07/01/26 09:35', signerName:'מירה גולן'},
+              ],
+              emailLog:[
+                {to:'pm@company.com',   at:'04/01/26 09:00', subj:'חשבון 01 ממתין לחתימתך — חברת יפה'},
+                {to:'vp@company.com',   at:'05/01/26 10:24', subj:'חשבון 01 ממתין לחתימתך — חברת יפה'},
+                {to:'finance@company.com', at:'06/01/26 14:12', subj:'חשבון 01 ממתין לחתימתך — חברת יפה'},
+              ]
+            },
+            {
+              id:'i2', number:'02', month:'פברואר 26', submitted:95000, approved:95000, file:'חשבון_02.pdf',
+              currentStep:1, invoiceStatus:'pending', comments:[{text:'נא לבדוק שורה 3 בחשבון', by:'ישראל כהן', at:'03/02/26 11:05', notified:'vp@company.com'}],
+              chain:[
+                {status:'done',   signedAt:'03/02/26 11:00', signerName:'ישראל כהן'},
+                {status:'active', signedAt:null, signerName:null},
+                {status:'pending',signedAt:null, signerName:null},
+              ],
+              emailLog:[
+                {to:'pm@company.com', at:'02/02/26 09:00', subj:'חשבון 02 ממתין לחתימתך'},
+                {to:'vp@company.com', at:'03/02/26 11:02', subj:'חשבון 02 ממתין לחתימתך'},
+              ]
+            }
+          ]
+        },
+        {
+          id:'v2', name:'מהנדסים ייעוץ בע״מ', domain:'ייעוץ הנדסי', taxId:'516987654',
+          amount:280000, indexType:'none', milestones:[],
+          invoices:[
+            {
+              id:'i3', number:'01', month:'ינואר 26', submitted:28000, approved:28000, file:null,
+              currentStep:0, invoiceStatus:'pending', comments:[],
+              chain:[
+                {status:'active', signedAt:null, signerName:null},
+                {status:'pending',signedAt:null, signerName:null},
+                {status:'pending',signedAt:null, signerName:null},
+              ],
+              emailLog:[{to:'pm@company.com', at:'10/01/26 09:00', subj:'חשבון 01 ממתין לחתימתך'}]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id:'2', name:'תשתיות רחוב הרצל', desc:'שיפוץ ושדרוג תשתיות עירוניות', status:'active', city:'חיפה',
+      vendors:[{id:'v3',name:'פלוג תשתיות',domain:'עפר ותשתיות',taxId:'512345678',amount:850000,indexType:'none',milestones:[],invoices:[]}]
+    },
+    {id:'3',name:'מרכז מסחרי B',desc:'פרויקט מרכז מסחרי - שלב ב',status:'pending',city:'תל אביב',vendors:[]}
+  ],
+  // ---- עיר לכל פרויקט ----
+  cities: ['תל אביב', 'חיפה', 'ירושלים', 'באר שבע', 'נתניה'],
+  // ---- מאגר משתמשים/אנשי קשר ----
+  users: [
+    { id:'u1', name:'ישראל כהן',    role:'מנהל פרויקט',    email:'pm@company.com',     icon:'👷' },
+    { id:'u2', name:'רחל לוי',      role:'סמנכ״ל הנדסה',  email:'vp@company.com',     icon:'🏗️' },
+    { id:'u3', name:'מירה גולן',    role:'חשבת החשבונות', email:'finance@company.com', icon:'💼' },
+    { id:'u4', name:'דוד אבני',     role:'מנהל פרויקט',    email:'david@company.com',  icon:'👷' },
+    { id:'u5', name:'שרה מזרחי',   role:'מנהלת הנדסה',   email:'sara@company.com',   icon:'🏛️' },
+    { id:'u6', name:'יוסי פרידמן', role:'מנהל כספים',     email:'yosi@company.com',   icon:'📊' },
+  ]
+};
+
+// ============================================================
+//  GOOGLE SHEETS API LAYER
+//  החלף את הכתובת לאחר פרסום ה-Apps Script
+// ============================================================
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxNjDuuZCEDJaNudXa2Y56D95A1edN7BGZWXI0yCSpkBW_Ns6tzUhijLNlcglFBHzgo2w/exec';
+let DB_CONNECTED = false;  // true after successful connection
+
+// Core API call
+async function api(action, body={}) {
+  if (!SHEETS_API_URL || SHEETS_API_URL.includes('YOUR_APPS')) {
+    return null; // offline mode — use local state
+  }
+  try {
+    const res = await fetch(SHEETS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...body })
+    });
+    const json = await res.json();
+    if (!json.ok) throw new Error(json.error);
+    return json.data;
+  } catch(e) {
+    console.warn('Sheets API error:', e.message);
+    return null;
+  }
+}
+
+// Load everything from Sheets on startup
+async function loadFromSheets() {
+  showSyncBadge('loading');
+  const data = await api('loadAll');
+  if (!data) { showSyncBadge('offline'); return false; }
+
+  // Merge into state — keep milestones array (not in sheets yet)
+  S.projects = data.projects.map(p => ({
+    ...p,
+    id: p.id,
+    vendors: (p.vendors||[]).map(v => ({
+      ...v,
+      amount: parseFloat(v.amount)||0,
+      milestones: [],
+      invoices: (v.invoices||[]).map(inv => ({
+        ...inv,
+        submitted: parseFloat(inv.submitted)||0,
+        approved:  parseFloat(inv.approved)||0,
+        currentStep: parseInt(inv.currentStep)||0,
+        chain: inv.chain||[],
+        emailLog: inv.emailLog||[]
+      }))
+    }))
+  }));
+
+  // Apply settings
+  if (data.settings) {
+    if (data.settings.emailProvider) EMAIL_PROVIDER = data.settings.emailProvider;
+    if (data.settings.pmEmail)      CHAIN[0].email = data.settings.pmEmail;
+    if (data.settings.vpEmail)      CHAIN[1].email = data.settings.vpEmail;
+    if (data.settings.financeEmail) CHAIN[2].email = data.settings.financeEmail;
+  }
+
+  DB_CONNECTED = true;
+  showSyncBadge('synced');
+  return true;
+}
+
+// Sync badge UI
+function showSyncBadge(state) {
+  const badge = document.getElementById('syncBadge');
+  if (!badge) return;
+  const states = {
+    loading: { text:'⟳ טוען...', bg:'#162d5a', color:'#aac' },
+    synced:  { text:'☁ מסונכרן', bg:'#1a4a2e', color:'#4ade80' },
+    offline: { text:'⚠ מצב מקומי', bg:'#3a2000', color:'#fbbf24' },
+    saving:  { text:'⟳ שומר...', bg:'#162d5a', color:'#aac' },
+    saved:   { text:'✓ נשמר', bg:'#1a4a2e', color:'#4ade80' },
+    error:   { text:'✕ שגיאת שמירה', bg:'#3a0000', color:'#f87171' },
+  };
+  const s = states[state] || states.offline;
+  badge.textContent = s.text;
+  badge.style.background = s.bg;
+  badge.style.color = s.color;
+}
+
+// Auto-save wrapper — persists to Sheets then updates local state
+async function saveToSheets(action, body, localUpdateFn) {
+  // Optimistic local update immediately
+  if (localUpdateFn) localUpdateFn();
+
+  if (!DB_CONNECTED) return; // offline mode
+  showSyncBadge('saving');
+  const result = await api(action, body);
+  if (result === null) { showSyncBadge('error'); return null; }
+  showSyncBadge('saved');
+  setTimeout(() => showSyncBadge('synced'), 2000);
+  return result;
+}
+
+// ========== NAV ==========
+function showView(v) {
+  document.querySelectorAll('[id^="view-"]').forEach(el => el.style.display='none');
+  const el = document.getElementById('view-'+v);
+  if (el) { el.style.display='flex'; el.style.flexDirection='column'; }
+  if (v==='projects')           { renderProjects(); updateStats(); }
+  if (v==='vendors')             renderVendors();
+  if (v==='invoices')            renderInvoices();
+  if (v==='invoice-detail')      renderInvDetail();
+  if (v==='reports')             renderReports();
+  if (v==='pending-approvals')   renderPending();
+  if (v==='settings')            renderSettings();
+}
+
+function updateStats() {
+  let pActive=0, vCount=0, iCount=0, pCount=0;
+  S.projects.forEach(p => {
+    if (p.status==='active') pActive++;
+    vCount += p.vendors.length;
+    p.vendors.forEach(v => {
+      iCount += v.invoices.length;
+      v.invoices.forEach(i => { if (i.currentStep < CHAIN.length) pCount++; });
+    });
+  });
+  document.getElementById('sProjects').textContent = pActive;
+  document.getElementById('sVendors').textContent = vCount;
+  document.getElementById('sInvoices').textContent = iCount;
+  document.getElementById('sPending').textContent = pCount;
+  document.getElementById('pendingCount').textContent = pCount;
+}
+
+// ========== PROJECTS ==========
+// Track which cities are collapsed
+const collapsedCities = new Set();
+
+function renderProjects() {
+  const g = document.getElementById('projectsGrid');
+  const cityMap = {};
+  S.projects.forEach(p => {
+    const city = p.city || 'כללי';
+    if (!cityMap[city]) cityMap[city] = [];
+    cityMap[city].push(p);
+  });
+  const orderedCities = [
+    ...S.cities.filter(c => cityMap[c]),
+    ...Object.keys(cityMap).filter(c => !S.cities.includes(c))
+  ];
+  let html = '';
+  orderedCities.forEach(city => {
+    const pts = cityMap[city] || [];
+    const cityId = 'city_' + city.replace(/\s/g,'_');
+    const isCollapsed = collapsedCities.has(city);
+    html += `
+    <div style="grid-column:1/-1;margin-top:8px">
+      <!-- City header — clickable to collapse -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:${isCollapsed?4:14}px;cursor:pointer;user-select:none"
+           onclick="toggleCityGroup('${cityId}','${city}')">
+        <div style="width:32px;height:32px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🏙️</div>
+        <h3 style="font-size:17px;font-weight:800;color:var(--text)">${city}</h3>
+        <span style="font-size:12px;color:var(--gray-400);background:var(--gray-100);padding:2px 10px;border-radius:20px">${pts.length} פרויקטים</span>
+        <div style="flex:1;height:1px;background:var(--gray-200)"></div>
+        <!-- Collapse button -->
+        <button style="background:var(--gray-100);border:1px solid var(--gray-200);border-radius:8px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--gray-600);cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap"
+                onclick="event.stopPropagation();toggleCityGroup('${cityId}','${city}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="transition:transform .2s;transform:rotate(${isCollapsed?180:0}deg)">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+          </svg>
+          ${isCollapsed ? 'הצג' : 'מזער'}
+        </button>
+      </div>
+      <!-- City projects grid — collapsible -->
+      <div id="${cityId}" style="display:${isCollapsed?'none':'grid'};grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-bottom:8px">
+        ${pts.map(p => projectCardHtml(p)).join("")}
+        <div class="project-card" style="border:2px dashed var(--gray-200);background:transparent;display:flex;align-items:center;justify-content:center;min-height:160px;cursor:pointer"
+             onclick="openNewProjectInCity(\`${city}\`)">
+          <div style="text-align:center;color:var(--gray-400)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="opacity:.3;margin-bottom:6px"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            <p style="font-size:12px;font-weight:600">פרויקט חדש ב${city}</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+  html += `
+  <div style="grid-column:1/-1;margin-top:10px;padding:18px;background:var(--gray-50);border:2px dashed var(--gray-200);border-radius:14px;text-align:center;cursor:pointer"
+       onclick="openModal('modalProject')">
+    <span style="font-size:14px;font-weight:600;color:var(--gray-400)">🏙️ + הוסף פרויקט בעיר חדשה</span>
+  </div>`;
+  g.innerHTML = html;
+}
+
+function toggleCityGroup(cityId, cityName) {
+  const el = document.getElementById(cityId);
+  if (!el) return;
+  const isHidden = el.style.display === 'none';
+  el.style.display = isHidden ? 'grid' : 'none';
+  if (isHidden) collapsedCities.delete(cityName);
+  else          collapsedCities.add(cityName);
+  // Re-render to update arrow direction and button text
+  renderProjects();
+}
+
+function projectCardHtml(p) {
+  const tot = p.vendors.reduce((s,v)=>s+v.amount,0);
+  const paid = p.vendors.reduce((s,v)=>s+v.invoices.reduce((si,i)=>si+(i.approved||0),0),0);
+  const pct = tot>0?Math.round(paid/tot*100):0;
+  return `<div class="project-card" onclick="openProject(\'${p.id}\')">
+    <div class="project-card-header">
+      <h3>${p.name}</h3><p>${p.desc}</p>
+      <span class="project-status ${p.status==="active"?"status-active":"status-pending-proj"}">${p.status==="active"?"פעיל":"ממתין"}</span>
+    </div>
+    <div class="project-card-body">
+      <div class="project-meta">
+        <div class="meta-item"><strong>${p.vendors.length}</strong>ספקים</div>
+        <div class="meta-item"><strong>₪${N(tot)}</strong>חוזים</div>
+        <div class="meta-item"><strong>₪${N(paid)}</strong>שולם</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--gray-400)">ניצול</span><span style="font-size:12px;font-weight:700">${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>
+    <div class="project-card-footer">
+      <span style="font-size:13px;color:var(--gray-600)">${p.vendors.length} ספקים</span>
+      <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openProject(\'${p.id}\')">פתח</button>
+    </div>
+  </div>`;
+}
+
+function openNewProjectInCity(city) {
+  populateCityDropdown(city);
+  openModal("modalProject");
+}
+
+function populateCityDropdown(preselect) {
+  const sel = document.getElementById("fProjCity");
+  if (!sel) return;
+  sel.innerHTML = "<option value=''>— בחר עיר —</option>" +
+    S.cities.map(c => `<option value="${c}" ${c===preselect?"selected":""}>${c}</option>`).join("");
+}
+
+function addNewCity() {
+  const val = document.getElementById("fNewCity").value.trim();
+  if (!val) return;
+  if (!S.cities.includes(val)) S.cities.push(val);
+  populateCityDropdown(val);
+  document.getElementById("fNewCity").value = "";
+  toast(`✅ עיר "${val}" נוספה`);
+}
+
+function openProject(id) {
+  S.projId = id;
+  const p = S.projects.find(p => String(p.id) === String(id));
+  if (!p) { console.warn('Project not found:', id, S.projects.map(p=>p.id)); return; }
+  document.getElementById('vendorsTitle').textContent = p.name;
+  document.getElementById('projDetailName').textContent = p.name;
+  document.getElementById('projDetailDesc').textContent = p.desc;
+  document.getElementById('projDetailBudget').textContent = '₪'+N(p.vendors.reduce((s,v)=>s+v.amount,0));
+  showView('vendors');
+}
+
+// ========== VENDORS ==========
+function renderVendors() {
+  const p = S.projects.find(p => String(p.id) === String(S.projId));
+  if (!p) { console.warn('renderVendors: no project', S.projId); return; }
+  const l = document.getElementById('vendorsList');
+  if (!p.vendors.length) {
+    l.innerHTML = `<div style="text-align:center;padding:60px;color:var(--gray-400)">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="opacity:.2;margin-bottom:12px"><path d="M20 7H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zm-16-2h16V3H4v2z"/></svg>
+      <p style="font-size:15px;font-weight:600">אין ספקים עדיין</p>
+      <p style="font-size:13px;margin-top:6px">לחצו "ספק חדש" לפתיחת כרטיסייה ראשונה</p>
+    </div>`;
+    return;
+  }
+  l.innerHTML = p.vendors.map(v => {
+    const paid = v.invoices.reduce((s,i) => s+(i.approved||0), 0);
+    const pct  = v.amount > 0 ? Math.round(paid/v.amount*100) : 0;
+    const bar_color = pct >= 90 ? 'var(--error)' : pct >= 70 ? 'var(--warning)' : 'var(--gold)';
+    const invCount = v.invoices.length;
+    const approvedCount = v.invoices.filter(i => i.invoiceStatus === 'approved').length;
+
+    return `
+    <div class="vendor-card" onclick="openVendor('${v.id}')">
+      <!-- ID CARD HEADER -->
+      <div style="background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);padding:18px 22px 14px;position:relative">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+          <div style="flex:1">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,.4);text-transform:uppercase;margin-bottom:5px">תעודת ספק</div>
+            <div style="font-size:18px;font-weight:800;color:var(--white);line-height:1.2">${v.name}</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">${v.domain} · ח.פ ${v.taxId}</div>
+          </div>
+          <div style="text-align:left;flex-shrink:0">
+            <div style="font-size:10px;color:rgba(255,255,255,.4);margin-bottom:4px">סכום חוזה</div>
+            <div style="font-size:20px;font-weight:800;color:var(--gold)">₪${N(v.amount)}</div>
+          </div>
+        </div>
+        <!-- Index badge -->
+        <div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:rgba(255,255,255,.08);border-radius:20px;font-size:12px;color:rgba(255,255,255,.6)">
+          ${indexLabel(v)}
+        </div>
+      </div>
+
+      <!-- ID CARD BODY — progress + stats -->
+      <div style="padding:16px 22px">
+        <!-- Progress bar with amounts -->
+        <div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+            <span style="font-size:12px;color:var(--gray-400)">שולם מתוך ההסכם</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text)">${pct}%</span>
+          </div>
+          <div style="height:10px;background:var(--gray-100);border-radius:5px;overflow:hidden;position:relative">
+            <div style="width:${pct}%;height:100%;background:linear-gradient(90deg,${bar_color},${bar_color}cc);border-radius:5px;transition:width .8s ease;position:relative">
+              ${pct > 10 ? `<div style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:700;color:white">₪${N(paid)}</div>` : ''}
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:5px">
+            <span style="font-size:11px;color:var(--success);font-weight:600">✓ שולם: ₪${N(paid)}</span>
+            <span style="font-size:11px;color:var(--gray-400)">יתרה: ₪${N(v.amount - paid)}</span>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:flex;gap:0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden">
+          <div style="flex:1;padding:10px 14px;text-align:center;border-left:1px solid var(--gray-200)">
+            <div style="font-size:18px;font-weight:800;color:var(--text)">${invCount}</div>
+            <div style="font-size:11px;color:var(--gray-400)">חשבונות</div>
+          </div>
+          <div style="flex:1;padding:10px 14px;text-align:center;border-left:1px solid var(--gray-200)">
+            <div style="font-size:18px;font-weight:800;color:var(--success)">${approvedCount}</div>
+            <div style="font-size:11px;color:var(--gray-400)">אושרו</div>
+          </div>
+          <div style="flex:1;padding:10px 14px;text-align:center">
+            <div style="font-size:18px;font-weight:800;color:var(--warning)">${invCount - approvedCount}</div>
+            <div style="font-size:11px;color:var(--gray-400)">בתהליך</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding:10px 22px 14px;border-top:1px solid var(--gray-100);display:flex;justify-content:flex-end">
+        <button class="btn btn-sm btn-outline" onclick="event.stopPropagation();openVendor('${v.id}')">פתח חשבונות ←</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openVendor(id) {
+  S.vendorId = id;
+  const p = S.projects.find(p => String(p.id) === String(S.projId));
+  if (!p) return;
+  const v = p.vendors.find(v => String(v.id) === String(id));
+  if (!v) return;
+  document.getElementById('invListTitle').textContent = v.name;
+  document.getElementById('invListSubtitle').textContent = v.domain+' · '+p.name;
+  showView('invoices');
+}
+
+// ========== INVOICES LIST ==========
+function renderInvoices() {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  if (!v) return;
+  const paid=v.invoices.reduce((s,i)=>s+(i.approved||0),0);
+  const pct=v.amount>0?Math.round(paid/v.amount*100):0;
+
+  // ---- Contract summary strip ----
+  document.getElementById('contractSummary').innerHTML = `
+    <div><div style="font-size:11px;color:var(--gray-400)">ספק</div><div style="font-weight:700">${v.name}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400)">תחום</div><div style="font-weight:700">${v.domain}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400)">ח.פ</div><div style="font-weight:700">${v.taxId}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400)">סכום הסכם</div><div style="font-weight:700">₪${N(v.amount)}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400)">שולם</div><div style="font-weight:700;color:var(--success)">₪${N(paid)}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400)">יתרה</div><div style="font-weight:700;color:var(--warning)">₪${N(v.amount-paid)}</div></div>
+    <div><div style="font-size:11px;color:var(--gray-400);margin-bottom:4px">מדד</div><div style="font-size:13px">${indexLabel(v)}</div></div>
+    <div style="flex:1;min-width:160px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--gray-400)">ניצול</span><span style="font-size:12px;font-weight:700">${pct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    </div>`;
+
+  // ---- Milestones ----
+  if (v.milestones?.length) {
+    document.getElementById('milestonesSection').style.display='block';
+    document.getElementById('milestonesList').innerHTML = v.milestones.map((m,i)=>`<div class="milestone-item"><div class="ms-num">${i+1}</div><div style="flex:1;font-size:13px">${m.desc}</div><div style="font-weight:700;font-size:13px">₪${N(m.amount)}</div></div>`).join('');
+  } else document.getElementById('milestonesSection').style.display='none';
+
+  if (!v.invoices.length) {
+    document.getElementById('invTableBody').innerHTML='';
+    document.getElementById('noInvoices').style.display='block';
+    document.getElementById('invMatrixSection').style.display='none';
+    return;
+  }
+  document.getElementById('noInvoices').style.display='none';
+
+  // ---- MATRIX TABLE (חשבונות ×  הוגש/אושר) ----
+  const sorted = [...v.invoices].sort((a,b)=>parseInt(a.number)-parseInt(b.number));
+  let matrixHtml = `
+    <div style="background:var(--white);border-radius:12px;border:1px solid var(--gray-200);overflow-x:auto;margin-bottom:28px">
+      <div style="padding:16px 20px 10px;font-size:15px;font-weight:700;border-bottom:1px solid var(--gray-100)">
+        סיכום חשבונות — מוגש מול מאושר
+      </div>
+      <table style="width:100%;border-collapse:collapse;min-width:500px">
+        <thead>
+          <tr style="background:var(--gray-50)">
+            <th style="text-align:right;padding:10px 16px;font-size:12px;color:var(--gray-400);font-weight:600;border-bottom:1px solid var(--gray-200)">חשבון</th>
+            <th style="text-align:right;padding:10px 16px;font-size:12px;color:var(--gray-400);font-weight:600;border-bottom:1px solid var(--gray-200)">חודש</th>
+            ${sorted.map(inv=>`
+            <th style="text-align:center;padding:8px 12px;font-size:12px;color:var(--navy);font-weight:700;border-bottom:1px solid var(--gray-200);border-right:1px solid var(--gray-200);min-width:100px">
+              <div style="font-size:13px;font-weight:800">#${inv.number}</div>
+              <div style="font-size:10px;color:var(--gray-400);margin-top:1px">${inv.month}</div>
+            </th>`).join('')}
+            <th style="text-align:center;padding:10px 16px;font-size:12px;color:var(--gray-400);font-weight:600;border-bottom:1px solid var(--gray-200)">סה"כ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--gray-100)">
+            <td colspan="2" style="padding:10px 16px;font-size:13px;font-weight:600;color:var(--gray-600)">הוגש</td>
+            ${sorted.map(inv=>`<td style="text-align:center;padding:10px 12px;font-size:13px;font-weight:600;border-right:1px solid var(--gray-100)">₪${N(inv.submitted)}</td>`).join('')}
+            <td style="text-align:center;padding:10px 16px;font-size:13px;font-weight:700;color:var(--navy)">₪${N(sorted.reduce((s,i)=>s+(i.submitted||0),0))}</td>
+          </tr>
+          <tr>
+            <td colspan="2" style="padding:10px 16px;font-size:13px;font-weight:600;color:var(--success)">אושר</td>
+            ${sorted.map(inv=>{
+              const done=inv.currentStep>=getEffectiveChain(inv).length;
+              return `<td style="text-align:center;padding:10px 12px;border-right:1px solid var(--gray-100)">
+                <div style="font-size:13px;font-weight:700;color:${done?'var(--success)':'var(--warning)'}">₪${N(inv.approved)}</div>
+                <div style="font-size:10px;margin-top:2px">${done?'✅':'⏳'}</div>
+              </td>`;
+            }).join('')}
+            <td style="text-align:center;padding:10px 16px;font-size:13px;font-weight:700;color:var(--success)">₪${N(paid)}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`;
+  document.getElementById('invMatrixSection').innerHTML = matrixHtml;
+  document.getElementById('invMatrixSection').style.display='block';
+
+  // ---- DETAILED TABLE with expandable file row ----
+  document.getElementById('invTableBody').innerHTML = v.invoices.map(inv=>{
+    const done=inv.currentStep>=getEffectiveChain(inv).length;
+    const step=done?null:CHAIN[inv.currentStep];
+    const hasFile=inv.file && inv.file!=='null' && inv.file!=='';
+    const sigsDone = inv.chain ? inv.chain.filter(c=>c.status==='done') : [];
+
+    return `
+    <tr class="invoice-row" onclick="openInvDetail('${inv.id}')">
+      <td><strong>חשבון ${inv.number}</strong></td>
+      <td>${inv.month}</td>
+      <td>₪${N(inv.submitted)}</td>
+      <td>₪${N(inv.approved)}</td>
+      <td>${done?'<span class="badge badge-done">✅ הושלם</span>':`<span class="badge badge-step">⏳ ${step.label}</span>`}</td>
+      <td>${done?'<span class="badge badge-done">אושר</span>':inv.currentStep===0?'<span class="badge badge-pending">ממתין</span>':'<span class="badge badge-inprogress">בתהליך</span>'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm ${done?'btn-outline':'btn-gold'}" onclick="event.stopPropagation();openInvDetail('${inv.id}')">${done?'צפה':'טפל'}</button>
+        ${hasFile?`<button class="btn btn-sm btn-outline" style="margin-right:6px" onclick="event.stopPropagation();toggleInvDoc('doc_${inv.id}')">
+          📄 מסמך${sigsDone.length>0?' ('+sigsDone.length+' ✓)':''}
+        </button>`:''}
+      </td>
+    </tr>
+    ${hasFile?`
+    <tr id="doc_${inv.id}" style="display:none">
+      <td colspan="7" style="padding:0;background:var(--gray-50)">
+        <div style="padding:16px 20px;border-top:1px solid var(--gray-100)">
+          <div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">
+            <!-- File info -->
+            <div style="flex:1;min-width:220px">
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">📄 ${inv.file}</div>
+              <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;text-align:center">
+                ${inv.file.toLowerCase().endsWith('.pdf')?
+                  `<svg width="36" height="36" viewBox="0 0 24 24" fill="#e53e3e" style="margin-bottom:8px"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg><br>` :
+                  `<svg width="36" height="36" viewBox="0 0 24 24" fill="#2b579a" style="margin-bottom:8px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/></svg><br>`}
+                <div style="font-size:12px;color:var(--gray-600)">${inv.file}</div>
+                <div style="font-size:11px;color:var(--gray-400);margin-top:4px">הקובץ שמור במערכת</div>
+              </div>
+            </div>
+            <!-- Signatures status -->
+            <div style="flex:2;min-width:260px">
+              <div style="font-size:13px;font-weight:700;margin-bottom:10px">✍️ סטטוס חתימות</div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                ${CHAIN.map((ch,i)=>{
+                  const ci=inv.chain&&inv.chain[i]?inv.chain[i]:{status:'pending'};
+                  const bg = ci.status==='done'?'rgba(42,157,92,.08)':ci.status==='active'?'rgba(201,168,76,.1)':'var(--gray-50)';
+                  const border = ci.status==='done'?'rgba(42,157,92,.3)':ci.status==='active'?'rgba(201,168,76,.4)':'var(--gray-200)';
+                  const icon = ci.status==='done'?'✅':ci.status==='active'?'⏳':'○';
+                  return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:${bg};border:1px solid ${border};border-radius:8px">
+                    <span style="font-size:16px">${icon}</span>
+                    <div style="flex:1">
+                      <div style="font-size:13px;font-weight:600">${ch.label}</div>
+                      ${ci.status==='done'?`<div style="font-size:11px;color:var(--success)">חתם: ${ci.signerName} · ${ci.signedAt}</div>`:
+                        ci.status==='active'?'<div style="font-size:11px;color:var(--warning)">ממתין לחתימה</div>':
+                        '<div style="font-size:11px;color:var(--gray-400)">טרם הגיע</div>'}
+                    </div>
+                    ${ci.status==='active'?`<button class="btn btn-sm btn-gold" onclick="event.stopPropagation();S.invoiceId='${inv.id}';openSignModal()">חתום</button>`:''}
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      </td>
+    </tr>`:''}`;
+  }).join('');
+}
+
+function toggleInvDoc(id) {
+  const el=document.getElementById(id);
+  if(el) el.style.display = el.style.display==='none'?'table-row':'none';
+}
+
+function openInvDetail(id) { S.invoiceId=String(id); showView('invoice-detail'); }
+
+// ========== INVOICE DETAIL ==========
+function renderInvDetail() {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  const inv=v?.invoices.find(i=>String(i.id)===String(S.invoiceId));
+  if (!inv) return;
+  const EC=getEffectiveChain(inv);
+  const done=inv.currentStep>=EC.length;
+  document.getElementById('invDetailTitle').textContent = `חשבון ${inv.number} — ${inv.month}`;
+  document.getElementById('invDetailSub').textContent = v.name+' · '+p.name;
+  document.getElementById('mainSignBtn').style.display = done?'none':'flex';
+
+  // Timeline
+  const chainHtml = `<div class="chain-wrapper">${EC.map((step,i)=>{
+    const ci=inv.chain[i]||{status:'pending'};
+    const cls=ci.status==='done'?'cs-done':ci.status==='active'?'cs-active':'cs-pending';
+    const ico=ci.status==='done'?'✓':step.icon;
+    const stepStatus = ci.stepStatus;
+    const stepStatusBadge = stepStatus==='approved'
+      ? '<div style="font-size:10px;font-weight:700;color:var(--success);margin-top:3px">✅ אישר</div>'
+      : stepStatus==='rejected'
+      ? '<div style="font-size:10px;font-weight:700;color:var(--error);margin-top:3px">❌ לא אישר</div>'
+      : '';
+    return `<div class="chain-step ${cls}">
+      <div class="chain-icon">${ico}</div>
+      <div class="chain-label">${step.label}</div>
+      <div class="chain-sublabel">${ci.status==='done'?ci.signerName:ci.status==='active'?'ממתין לחתימה':'טרם הגיע'}</div>
+      ${ci.status==='done'&&ci.signedAt?`<div class="chain-date">${ci.signedAt}</div>`:''}
+      ${stepStatusBadge}
+    </div>`;
+  }).join('')}</div>`;
+
+  // Email log
+  const emailHtml = inv.emailLog?.length ? `
+    <div style="margin-top:16px">
+      <h4 style="font-size:13px;font-weight:700;margin-bottom:8px">📧 יומן מיילים</h4>
+      ${inv.emailLog.map(e=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--gray-50);border-radius:8px;margin-bottom:5px">
+        <span class="email-badge eb-sent" style="font-size:11px">✉ נשלח</span>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600">${e.to}</div><div style="font-size:11px;color:var(--gray-400)">${e.subj} · ${e.at}</div></div>
+      </div>`).join('')}
+    </div>` : '';
+
+  // Status rubric
+  const invStatus = inv.invoiceStatus || 'pending';
+  const statusOptions = [
+    { val:'approved', label:'✅ אושר והועבר להנהלת חשבונות לתשלום', bg:'rgba(42,157,92,.08)', border:'rgba(42,157,92,.3)', color:'var(--success)' },
+    { val:'rejected', label:'❌ לא אושר — נדרשות הערות',            bg:'rgba(217,64,64,.06)', border:'rgba(217,64,64,.3)', color:'var(--error)' },
+    { val:'pending',  label:'⏳ ממתין לאישור',                       bg:'rgba(224,122,26,.06)', border:'rgba(224,122,26,.3)', color:'var(--warning)' },
+  ];
+  const curOpt = statusOptions.find(s=>s.val===invStatus)||statusOptions[2];
+
+  const statusHtml = `
+    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">📋 סטטוס חשבון</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        ${statusOptions.map(opt=>`
+          <div onclick="setInvStatus('${opt.val}')"
+            style="flex:1;min-width:150px;padding:11px 14px;border-radius:10px;border:2px solid ${invStatus===opt.val?opt.border:'var(--gray-200)'};background:${invStatus===opt.val?opt.bg:'var(--white)'};cursor:pointer;transition:all .2s">
+            <div style="font-size:13px;font-weight:700;color:${invStatus===opt.val?opt.color:'var(--gray-600)'}">${opt.label}</div>
+          </div>`).join('')}
+      </div>
+      <div style="padding:10px 14px;border-radius:8px;background:${curOpt.bg};border:1px solid ${curOpt.border}">
+        <div style="font-size:13px;font-weight:700;color:${curOpt.color}">${curOpt.label}</div>
+      </div>
+    </div>`;
+
+  // Comments
+  const comments = inv.comments || [];
+  const commentsHtml = `
+    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">💬 הערות לחשבון</h3>
+      ${comments.length ? comments.map(c=>`
+        <div style="padding:12px 14px;background:${c.notified?'rgba(201,168,76,.06)':'var(--gray-50)'};border:1px solid ${c.notified?'rgba(201,168,76,.2)':'var(--gray-200)'};border-radius:8px;margin-bottom:8px">
+          <div style="font-size:13px;color:var(--text);line-height:1.5">${c.text}</div>
+          <div style="font-size:11px;color:var(--gray-400);margin-top:5px">— ${c.by} · ${c.at}
+            ${c.notified?`<span style="margin-right:8px;color:var(--gold);font-weight:600">📧 נשלח ל: ${c.notified}</span>`:''}
+          </div>
+        </div>`).join('') : '<div style="font-size:13px;color:var(--gray-400);padding:14px;background:var(--gray-50);border-radius:8px;text-align:center;margin-bottom:14px">אין הערות עדיין</div>'}
+      <div style="border:1px solid var(--gray-200);border-radius:10px;padding:14px;background:var(--gray-50)">
+        <label style="font-size:12px;font-weight:600;color:var(--gray-600);display:block;margin-bottom:6px">הוסף הערה:</label>
+        <textarea id="commentText_${inv.id}" placeholder="הכנס הערה לחשבון זה..." rows="3"
+          style="width:100%;padding:10px 12px;font-family:Heebo,sans-serif;font-size:13px;border:1.5px solid var(--gray-200);border-radius:8px;outline:none;resize:vertical;direction:rtl;background:var(--white);color:var(--text)"
+          onkeyup="toggleCommentNotifySection('${inv.id}',this.value)"></textarea>
+        <div id="commentNotifySection_${inv.id}" style="display:none;margin-top:10px;padding:12px;background:linear-gradient(135deg,#f0f7ff,#e8f4fd);border:1px solid #c3daf5;border-radius:8px">
+          <div style="font-size:12px;font-weight:700;color:#1a3a5c;margin-bottom:8px">📧 שלח התראה על ההערה אל:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${S.users.map(u=>`
+              <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--white);border:1px solid #c3daf5;border-radius:20px;cursor:pointer;font-size:12px;font-weight:600;color:var(--navy)">
+                <input type="checkbox" value="${u.email}" name="commentNotify_${inv.id}" style="accent-color:var(--gold)" />
+                ${u.icon} ${u.name}
+              </label>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn btn-primary btn-sm" onclick="addComment('${inv.id}')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            שמור ושלח
+          </button>
+        </div>
+      </div>
+    </div>`;
+
+  document.getElementById('invDetailBody').innerHTML = `
+    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:20px 24px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div><div style="font-size:18px;font-weight:800">חשבון ${inv.number} · ${inv.month}</div><div style="font-size:13px;color:var(--gray-400);margin-top:3px">${v.name} · ${v.domain}</div></div>
+        <div>${done?'<span class="badge badge-done" style="font-size:13px;padding:6px 16px">✅ שרשרת הושלמה</span>':`<span class="badge badge-step" style="font-size:13px;padding:6px 16px">⏳ שלב ${inv.currentStep+1}/${EC.length}</span>`}</div>
+      </div>
+      <div style="display:flex;gap:22px;flex-wrap:wrap">
+        <div><div style="font-size:11px;color:var(--gray-400)">סכום שהוגש</div><div style="font-weight:700;font-size:15px">₪${N(inv.submitted)}</div></div>
+        <div><div style="font-size:11px;color:var(--gray-400)">סכום מאושר</div><div style="font-weight:700;font-size:15px;color:var(--success)">₪${N(inv.approved)}</div></div>
+        <div><div style="font-size:11px;color:var(--gray-400)">קובץ</div><div style="font-weight:700;font-size:15px">${inv.file||'לא צורף'}</div></div>
+      </div>
+    </div>
+    ${statusHtml}
+    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:22px 26px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:18px">🔗 שרשרת אישורים וחתימות</h3>
+      ${chainHtml}${emailHtml}
+    </div>
+    ${commentsHtml}
+    ${!done?`
+    <div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,.25);border-radius:12px;padding:18px 22px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:5px">✍️ תורך לחתום — ${EC[inv.currentStep]?.label}</div>
+      <div style="font-size:13px;color:var(--gray-600);margin-bottom:12px">לאחר חתימתך, ${inv.currentStep+1<EC.length?'יישלח מייל ל'+EC[inv.currentStep+1].label:'החשבון יסומן כמאושר במלואו'}</div>
+      <button class="btn btn-gold" onclick="openSignModal()">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        חתום עכשיו
+      </button>
+    </div>` : ''}`;
+}
+
+function setInvStatus(status) {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  const inv=v?.invoices.find(i=>String(i.id)===String(S.invoiceId));
+  if (!inv) return;
+  inv.invoiceStatus = status;
+  const labels={approved:'✅ אושר והועבר להנהלת חשבונות',rejected:'❌ לא אושר',pending:'⏳ ממתין'};
+  toast(labels[status]||'סטטוס עודכן');
+  renderInvDetail(); renderInvoices();
+}
+
+function toggleCommentNotifySection(invId, text) {
+  const el=document.getElementById('commentNotifySection_'+invId);
+  if (el) el.style.display=text.trim()?'block':'none';
+}
+
+async function addComment(invId) {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  const inv=v?.invoices.find(i=>String(i.id)===invId);
+  if (!inv) return;
+  const textEl=document.getElementById('commentText_'+invId);
+  const text=textEl?.value?.trim();
+  if (!text){toast('נא להזין הערה','error');return;}
+  const checked=[...document.querySelectorAll(`input[name="commentNotify_${invId}"]:checked`)];
+  const recipients=checked.map(cb=>cb.value);
+  const now=new Date();
+  const at=`${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(-2)} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  if (!inv.comments) inv.comments=[];
+  inv.comments.push({text,by:S.user.name,at,notified:recipients.length?recipients.join(', '):null});
+  if (recipients.length) {
+    const recipientUsers=S.users.filter(u=>recipients.includes(u.email));
+    for (const ru of recipientUsers) await sendCommentAlert(inv,p,v,text,ru,at);
+  }
+  if (textEl) textEl.value='';
+  toast(`✅ הערה נשמרה${recipients.length?' ומייל נשלח':''}`);
+  renderInvDetail();
+}
+
+async function sendCommentAlert(inv,proj,vendor,commentText,recipient,at) {
+  const providerName=EMAIL_PROVIDER==='outlook'?'Outlook':'Gmail';
+  const mcpUrl=EMAIL_PROVIDER==='outlook'?OUTLOOK_MCP_URL:GMAIL_MCP_URL;
+  const subject=`[הערה לחשבון] חשבון ${inv.number} — ${vendor.name} · ${proj.name}`;
+  const body=`שלום ${recipient.name},
+
+נוספה הערה לחשבון ${inv.number} (${inv.month}) של "${vendor.name}" בפרויקט "${proj.name}":
+
+"${commentText}"
+
+— ${S.user.name} · ${at}
+
+בברכה,
+מערכת אישור חשבונות`;
+  try {
+    await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
+        system:`Send email via ${providerName} MCP`,
+        messages:[{role:"user",content:`Send to ${recipient.email}, subject: ${subject}, body: ${body}`}],
+        mcp_servers:[{type:"url",url:mcpUrl,name:providerName.toLowerCase()+'-mcp'}]})});
+    if (!inv.emailLog) inv.emailLog=[];
+    inv.emailLog.push({to:recipient.email,at,subj:subject});
+  } catch(e){console.warn('Comment alert error:',e);}
+}
+
+// ========== SIGN MODAL ==========
+function openSignModal() {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  const inv=v?.invoices.find(i=>String(i.id)===String(S.invoiceId));
+  if (!inv) return;
+  const EC=getEffectiveChain(inv), idx=inv.currentStep, step=EC[idx], next=EC[idx+1];
+  document.getElementById('signSubtitle').textContent = `חשבון ${inv.number} · ${v.name}`;
+  document.getElementById('signStepLabel').textContent = `שלב ${idx+1} מתוך ${EC.length} — ${step.label}`;
+  document.getElementById('signStepDesc').textContent = next
+    ? `לאחר חתימתך, יישלח מייל אוטומטי ל${next.label} (${next.email})`
+    : 'זהו שלב האחרון — לאחר חתימתך החשבון יאושר במלואו';
+  document.getElementById('emailPanelInfo').textContent = next
+    ? `מייל יישלח אל: ${next.name} ‹${next.email}›`
+    : 'לא יישלח מייל נוסף — זהו שלב האחרון';
+  document.getElementById('emailRecipient').textContent = next ? `📬 ${next.name}` : '🏁 שלב אחרון';
+  const badge = document.getElementById('emailProviderBadge');
+  const isOutlook = EMAIL_PROVIDER === 'outlook';
+  badge.textContent = isOutlook ? '📨 Outlook MCP' : '📧 Gmail MCP';
+  badge.style.background = isOutlook ? '#f0f7ff' : '#fff3f3';
+  badge.style.borderColor = isOutlook ? '#c3daf5' : '#fcc';
+  badge.style.color       = isOutlook ? '#0078d4' : '#d93025';
+  openModal('modalSign');
+  setTimeout(initSig, 80);
+}
+
+function initSig() {
+  const c=document.getElementById('sigCanvas'), ctx=c.getContext('2d');
+  S.sig.canvas=c; S.sig.ctx=ctx;
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#1a2340'; ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  S.sig.drawing=false;
+  document.getElementById('sigPlaceholder').style.display='flex';
+  c.onmousedown=e=>{S.sig.drawing=true;document.getElementById('sigPlaceholder').style.display='none';const r=c.getBoundingClientRect();ctx.beginPath();ctx.moveTo(e.clientX-r.left,e.clientY-r.top);};
+  c.onmousemove=e=>{if(!S.sig.drawing)return;const r=c.getBoundingClientRect();ctx.lineTo(e.clientX-r.left,e.clientY-r.top);ctx.stroke();};
+  c.onmouseup=c.onmouseleave=()=>S.sig.drawing=false;
+  c.ontouchstart=e=>{e.preventDefault();S.sig.drawing=true;document.getElementById('sigPlaceholder').style.display='none';const r=c.getBoundingClientRect(),t=e.touches[0];ctx.beginPath();ctx.moveTo(t.clientX-r.left,t.clientY-r.top);};
+  c.ontouchmove=e=>{e.preventDefault();if(!S.sig.drawing)return;const r=c.getBoundingClientRect(),t=e.touches[0];ctx.lineTo(t.clientX-r.left,t.clientY-r.top);ctx.stroke();};
+  c.ontouchend=()=>S.sig.drawing=false;
+}
+function clearSig(){if(S.sig.ctx){S.sig.ctx.clearRect(0,0,S.sig.canvas.width,S.sig.canvas.height);document.getElementById('sigPlaceholder').style.display='flex';}}
+function loadSigImg(input){if(!input.files[0])return;const r=new FileReader();r.onload=e=>{const i=new Image();i.onload=()=>{S.sig.ctx.clearRect(0,0,480,155);S.sig.ctx.drawImage(i,0,0,480,155);document.getElementById('sigPlaceholder').style.display='none';};i.src=e.target.result;};r.readAsDataURL(input.files[0]);}
+
+async function confirmSign() {
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const v=p?.vendors.find(v=>String(v.id)===String(S.vendorId));
+  const inv=v?.invoices.find(i=>String(i.id)===String(S.invoiceId));
+  if (!inv) return;
+  const EC=getEffectiveChain(inv), idx=inv.currentStep, step=EC[idx], next=EC[idx+1];
+  const now=new Date();
+  const dateStr=`${pad(now.getDate())}/${pad(now.getMonth()+1)}/${String(now.getFullYear()).slice(-2)} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  // Optimistic local update
+  inv.chain[idx]={status:'done',signedAt:dateStr,signerName:S.user.name};
+  if (next) inv.chain[idx+1]={...inv.chain[idx+1],status:'active'};
+  inv.currentStep=idx+1;
+  closeModal('modalSign');
+
+  // Persist to Sheets
+  await saveToSheets('updateInvoiceStep', {
+    invoiceId: inv.id,
+    stepIndex:  idx,
+    signerName: S.user.name,
+    sigData:    '',
+    emailTo:       next ? next.email   : null,
+    emailToName:   next ? next.name    : null,
+    emailSubject:  next ? `חשבון ${inv.number} ממתין לחתימתך — ${v.name}` : null,
+    provider: EMAIL_PROVIDER
+  });
+
+  if (next) await sendEmail(inv,p,v,step,next,dateStr);
+  else { toast('✅ החשבון אושר במלואו על ידי כל החותמים!'); }
+  renderInvDetail(); updateStats();
+}
+
+async function sendEmail(inv, proj, vendor, fromStep, toStep, at) {
+  const providerName = EMAIL_PROVIDER === 'outlook' ? 'Outlook' : 'Gmail';
+  const mcpUrl       = EMAIL_PROVIDER === 'outlook' ? OUTLOOK_MCP_URL : GMAIL_MCP_URL;
+  const mcpName      = EMAIL_PROVIDER === 'outlook' ? 'outlook-mcp' : 'gmail-mcp';
+
+  document.getElementById('emailModalTitle').textContent = `שולח מייל דרך ${providerName}...`;
+  document.getElementById('emailModalDesc').textContent  = `מכין מייל ל${toStep.name} (${toStep.email})`;
+  document.getElementById('emailModalFooter').style.display = 'none';
+  openModal('modalEmail');
+
+  const subject = `[אישור חשבון] חשבון ${inv.number} — ${vendor.name} · ${proj.name} — ממתין לחתימתך`;
+  const body    = `שלום ${toStep.name},\n\nחשבון ${inv.number} לחודש ${inv.month} של ספק "${vendor.name}" בפרויקט "${proj.name}" ממתין לחתימתך.\n\nסכום מוגש: ₪${N(inv.submitted)}\nסכום מאושר: ₪${N(inv.approved)}\nשלב קודם אושר על ידי: ${fromStep.label} ב-${at}\n\nיש להיכנס למערכת ולאתר את החשבון תחת "ממתין לאישורי".\n\nבברכה,\nמערכת אישור חשבונות`;
+
+  try {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514", max_tokens:500,
+        system:`Send the email using ${providerName} MCP. Respond with JSON: {"sent":true}`,
+        messages:[{role:"user",content:`Send email to ${toStep.email}, subject: ${subject}, body: ${body}`}],
+        mcp_servers:[{type:"url", url: mcpUrl, name: mcpName}]
+      })
+    });
+    await resp.json();
+    logEmail(inv, toStep.email, at, subject, providerName);
+    showEmailSuccess(toStep, subject, at, true, providerName);
+  } catch(e) {
+    logEmail(inv, toStep.email, at, subject, providerName);
+    showEmailSuccess(toStep, subject, at, false, providerName);
+  }
+}
+
+function logEmail(inv, to, at, subj, provider='Gmail') {
+  if (!inv.emailLog) inv.emailLog = [];
+  inv.emailLog.push({to, at, subj, provider});
+}
+
+function showEmailSuccess(toStep, subject, at, realSend, provider='Gmail') {
+  const isOutlook = provider === 'Outlook';
+  const provColor = isOutlook ? '#0078d4' : '#d93025';
+  const provIcon  = isOutlook
+    ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M7.88 12.04q0 .45-.11.87-.1.41-.33.74-.22.33-.58.52-.37.2-.87.2t-.85-.2q-.35-.19-.57-.53-.22-.33-.33-.75-.1-.42-.1-.86t.1-.87q.1-.43.34-.76.22-.34.59-.54.36-.2.87-.2t.86.2q.35.2.57.54.22.33.33.76.1.43.1.88zM24 12v9.38q0 .46-.33.8-.33.32-.8.32H7.13q-.46 0-.8-.33-.32-.34-.32-.8V18H1q-.41 0-.7-.3-.3-.29-.3-.7V7q0-.41.3-.7Q.58 6 1 6h6V2.62q0-.46.33-.8.33-.32.8-.32h15.74q.46 0 .8.33.33.34.33.8V12zm-7.85-3.93H9.37v7.86h1.64v-2.99h5.14v2.99h1.64V8.07zm-5.5 5.55v-4.23h3.86v4.23H10.65z"/></svg>`
+    : `<svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`;
+  document.getElementById('emailModalTitle').textContent = realSend ? `✅ מייל נשלח בהצלחה!` : `📧 מייל נרשם`;
+  document.getElementById('emailModalDesc').innerHTML = `
+    ${!realSend ? `<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px 14px;font-size:12px;color:#856404;margin-bottom:14px;text-align:right">
+      ⚠️ ${provider} MCP לא מחובר כרגע. לשליחה אמיתית, ודא שחיבור ${provider} מופעל בהגדרות Claude.
+    </div>` : ''}
+    <div style="display:flex;justify-content:center;margin-bottom:14px">
+      <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 16px;background:${provColor};border-radius:20px;font-size:13px;font-weight:600;color:white">
+        ${provIcon} שנשלח דרך ${provider}
+      </span>
+    </div>
+    <div style="text-align:right;font-size:13px;color:var(--gray-600);line-height:2;background:var(--gray-50);border-radius:8px;padding:12px 14px">
+      <strong>אל:</strong> ${toStep.name} &lt;${toStep.email}&gt;<br>
+      <strong>נושא:</strong> ${subject}<br>
+      <strong>נשלח ב:</strong> ${at}
+    </div>`;
+  document.getElementById('emailModalFooter').style.display = 'flex';
+  toast(`✅ חשבון נחתם — ${toStep.name} יקבל התראה דרך ${provider}`);
+}
+
+
+
+// ========== CREATE ==========
+function createProject() {
+  const name = document.getElementById('fProjName').value.trim();
+  const city = document.getElementById('fProjCity').value;
+  if (!name) { toast('נא להזין שם פרויקט','error'); return; }
+  if (!city) { toast('נא לבחור עיר','error'); return; }
+  const newProj = { id:'p_'+Date.now(), name, desc:document.getElementById('fProjDesc').value||'', status:'active', city, vendors:[] };
+  saveToSheets('saveProject', newProj, () => {
+    S.projects.push(newProj);
+    closeModal('modalProject'); toast('✅ פרויקט נוצר ונשמר');
+    renderProjects(); updateStats();
+    ['fProjName','fProjDesc','fProjStart','fProjEnd'].forEach(id=>document.getElementById(id).value='');
+  });
+}
+
+function createVendor() {
+  const name=document.getElementById('fVName').value.trim(),domain=document.getElementById('fVDomain').value.trim(),taxId=document.getElementById('fVTax').value.trim(),amount=parseFloat(document.getElementById('fVAmount').value)||0;
+  if (!name||!domain||!taxId||!amount){toast('נא למלא שדות חובה','error');return;}
+  const ms=[];
+  for(let i=0;i<S.msCount;i++){const d=document.getElementById('ms'+i+'d')?.value?.trim(),a=parseFloat(document.getElementById('ms'+i+'a')?.value)||0;if(d&&a)ms.push({desc:d,amount:a});}
+  const p=S.projects.find(p=>String(p.id)===String(S.projId));
+  const indexType = document.getElementById('fVIndex').value;
+  const newVendor = {
+    id:'v_'+Date.now(), projectId:String(S.projId), name, domain, taxId, amount,
+    indexType,
+    indexBase: indexType!=='none' ? (parseFloat(document.getElementById('fVIndexVal').value)||null) : null,
+    indexMonth: indexType!=='none' ? (document.getElementById('fVIndexMonth').value||null) : null,
+    milestones:ms, invoices:[]
+  };
+  saveToSheets('saveVendor', newVendor, () => {
+    p.vendors.push(newVendor);
+    closeModal('modalVendor'); toast('✅ ספק נוצר ונשמר'); S.msCount=1; renderVendors();
+  });
+}
+
+// Returns the chain definition for a specific invoice (custom or global)
+function getEffectiveChain(inv) {
+  return (inv && inv.chainConfig && inv.chainConfig.length) ? inv.chainConfig : CHAIN;
+}
+
+// ========== PER-INVOICE CHAIN BUILDER ==========
+// This holds the chain being built for the current new invoice
+let invChain = [];  // array of { id, label, icon, email, name }
+
+function initInvChain() {
+  // Copy global CHAIN as default
+  invChain = CHAIN.map(s => ({ ...s }));
+  renderInvChainEditor();
+  populateInvChainUserDropdown();
+}
+
+function renderInvChainEditor() {
+  const el = document.getElementById('invChainList');
+  if (!el) return;
+  if (!invChain.length) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--gray-400);font-size:13px">אין חותמים — הוסף לפחות אחד</div>';
+    return;
+  }
+  el.innerHTML = invChain.map((step, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--white);border-radius:8px;border:1px solid var(--gray-200);margin-bottom:6px">
+      <div style="width:24px;height:24px;border-radius:50%;background:var(--gold);color:var(--navy);font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+      <span style="font-size:16px">${step.icon}</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700">${step.name}</div>
+        <div style="font-size:11px;color:var(--gray-400)">${step.label} · ${step.email}</div>
+      </div>
+      <div style="display:flex;gap:3px">
+        ${i > 0 ? `<button onclick="moveInvStep(${i},-1)" style="background:none;border:1px solid var(--gray-200);border-radius:5px;cursor:pointer;padding:3px 7px;font-size:13px">⬆</button>` : ''}
+        ${i < invChain.length-1 ? `<button onclick="moveInvStep(${i},1)" style="background:none;border:1px solid var(--gray-200);border-radius:5px;cursor:pointer;padding:3px 7px;font-size:13px">⬇</button>` : ''}
+        <button onclick="removeInvStep(${i})" style="background:#fff0f0;border:1px solid #fdd;color:var(--error);border-radius:5px;cursor:pointer;padding:3px 8px;font-size:12px;font-weight:700">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function populateInvChainUserDropdown() {
+  const sel = document.getElementById('invChainAddUser');
+  if (!sel) return;
+  const inChain = invChain.map(s => s.email);
+  sel.innerHTML = '<option value="">+ הוסף חותם מהמאגר</option>' +
+    S.users.filter(u => !inChain.includes(u.email))
+            .map(u => `<option value="${u.id}">${u.icon} ${u.name} — ${u.role}</option>`).join('');
+}
+
+function addInvChainStep() {
+  const sel = document.getElementById('invChainAddUser');
+  const uid = sel.value;
+  if (!uid) return;
+  const user = S.users.find(u => u.id === uid);
+  if (!user) return;
+  invChain.push({ id: user.id, label: user.role, icon: user.icon, email: user.email, name: user.name });
+  renderInvChainEditor();
+  populateInvChainUserDropdown();
+}
+
+function moveInvStep(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= invChain.length) return;
+  [invChain[i], invChain[j]] = [invChain[j], invChain[i]];
+  renderInvChainEditor();
+}
+
+function removeInvStep(i) {
+  invChain.splice(i, 1);
+  renderInvChainEditor();
+  populateInvChainUserDropdown();
+}
+
+function resetInvChainToDefault() {
+  invChain = CHAIN.map(s => ({ ...s }));
+  renderInvChainEditor();
+  populateInvChainUserDropdown();
+}
+
+// ========== INDEX HELPERS ==========
+function indexLabel(v) {
+  if (!v.indexType || v.indexType === 'none') return '📊 לא מוצמד';
+  const typeName = v.indexType === 'cpi' ? 'מדד מחירים לצרכן' : 'מדד תשומות הבניה';
+  const base = v.indexBase ? ` · בסיס: ${v.indexBase}` : '';
+  const month = v.indexMonth ? ` (${v.indexMonth})` : '';
+  return `📈 ${typeName}${month}${base}`;
+}
+
+function onIndexTypeChange() {
+  const val = document.getElementById('fVIndex').value;
+  document.getElementById('indexDetailsGroup').style.display = val !== 'none' ? 'block' : 'none';
+}
+function addMs(){
+  const i=msC,w=document.getElementById('msInputs'),r=document.createElement('div');
+  r.style.cssText='display:flex;gap:8px;margin-bottom:8px';
+  r.innerHTML=`<input class="field-input" style="flex:2" id="ms${i}d" placeholder="תיאור"/><input type="number" class="field-input" style="flex:1" id="ms${i}a" placeholder="₪"/><button class="btn btn-sm btn-outline" onclick="this.parentElement.remove()" style="padding:8px 10px">−</button>`;
+  w.appendChild(r); msC++;
+}
+
+function createInvoice() {
+  const num = document.getElementById('fInvNum').value.trim();
+  if (!num) { toast('נא להזין מספר חשבון','error'); return; }
+  if (!invChain.length) { toast('נא להוסיף לפחות חותם אחד לשרשרת','error'); return; }
+  const p = S.projects.find(p => String(p.id) === String(S.projId));
+  const v = p?.vendors.find(v => String(v.id) === String(S.vendorId));
+  const chain = invChain.map((s, i) => ({ status: i===0?'active':'pending', signedAt:null, signerName:null }));
+  const firstSigner = invChain[0];
+  const newInv = {
+    id: 'i_'+Date.now(), vendorId: S.vendorId, projectId: S.projId,
+    number: num, month: document.getElementById('fInvMonth').value,
+    submitted: parseFloat(document.getElementById('fInvSubmit').value)||0,
+    approved:  parseFloat(document.getElementById('fInvApprove').value)||0,
+    file: document.getElementById('fileInput').files[0]?.name || null,
+    currentStep: 0,
+    chainConfig: invChain.map(s => ({ ...s })),
+    chain,
+    emailLog: [{ to: firstSigner.email, at: new Date().toLocaleString('he-IL'), subj: `חשבון ${num} ממתין לחתימתך` }]
+  };
+  saveToSheets('saveInvoice', newInv, () => {
+    v.invoices.push(newInv);
+    closeModal('modalInvoice');
+    toast(`✅ חשבון הועלה — מייל נשלח ל${firstSigner.name}`);
+    renderInvoices(); updateStats();
+    ['fInvNum','fInvSubmit','fInvApprove'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('fileInput').value = '';
+    resetUploadZone();
+  });
+}
+
+function handleFile(input) {
+  const f=input.files[0];
+  if(f){const z=document.getElementById('uploadZone');z.classList.add('has-file');z.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" style="width:28px;height:28px;color:var(--success)"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg><p style="font-weight:600;color:var(--success);margin-top:6px">${f.name}</p><span style="font-size:11px;color:var(--gray-400)">${(f.size/1024).toFixed(0)} KB</span>`;}
+}
+function resetUploadZone(){const z=document.getElementById('uploadZone');z.classList.remove('has-file');z.innerHTML='<svg viewBox="0 0 24 24" fill="currentColor" style="width:32px;height:32px;color:var(--gray-300);margin-bottom:8px"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg><p style="font-size:14px;color:var(--gray-600)">לחצו לבחירת קובץ</p><span style="font-size:11px;color:var(--gray-400)">PDF, JPG, PNG, DOCX</span>';}
+
+// ========== REPORTS ==========
+function renderReports() {
+  const c=document.getElementById('reportsContent');
+  let h=`<div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+    <button class="btn btn-primary" onclick="exportExcel()" style="background:linear-gradient(135deg,#1d6f42,#2a9d5c);gap:8px">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 7V3.5L18.5 9H13zM8 12.3l1.5 2.3L8 17h1.6l.9-1.7.9 1.7H13l-1.5-2.4L13 12.3h-1.6l-.8 1.5-.9-1.5H8zm5 0h3.5v1.1h-2.1v.9h2v1h-2v1.2h2.2V17H13v-4.7z"/></svg>
+      ייצוא Excel מלא
+    </button>
+  </div>`;
+  S.projects.forEach(p=>{
+    if(!p.vendors.length) return;
+    h+=`<div style="margin-bottom:28px"><h3 style="font-size:16px;font-weight:700;margin-bottom:14px">${p.name}</h3>
+    <div style="background:var(--white);border-radius:12px;border:1px solid var(--gray-200);overflow:hidden">
+    <table style="width:100%;border-collapse:collapse">
+    <thead><tr style="background:var(--gray-50)">
+      <th style="text-align:right;padding:11px 16px;font-size:12px;color:var(--gray-400);font-weight:600">ספק</th>
+      <th style="text-align:right;padding:11px 16px;font-size:12px;color:var(--gray-400);font-weight:600">הסכם</th>
+      <th style="text-align:right;padding:11px 16px;font-size:12px;color:var(--gray-400);font-weight:600">שולם מצטבר</th>
+      <th style="text-align:right;padding:11px 16px;font-size:12px;color:var(--gray-400);font-weight:600">יתרה</th>
+      <th style="text-align:right;padding:11px 16px;font-size:12px;color:var(--gray-400);font-weight:600">ניצול</th>
+    </tr></thead><tbody>`;
+    p.vendors.forEach(v=>{
+      const pd=v.invoices.reduce((s,i)=>s+(i.approved||0),0),rem=v.amount-pd,pct=v.amount>0?Math.round(pd/v.amount*100):0;
+      h+=`<tr style="border-top:1px solid var(--gray-100)">
+        <td style="padding:11px 16px;font-weight:600;font-size:14px">${v.name}</td>
+        <td style="padding:11px 16px;font-size:14px">₪${N(v.amount)}</td>
+        <td style="padding:11px 16px;font-size:14px;color:var(--success);font-weight:600">₪${N(pd)}</td>
+        <td style="padding:11px 16px;font-size:14px;color:var(--warning)">₪${N(rem)}</td>
+        <td style="padding:11px 16px"><div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;height:6px;background:var(--gray-100);border-radius:3px;overflow:hidden"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:3px"></div></div>
+          <span style="font-size:12px;font-weight:700;min-width:32px">${pct}%</span>
+        </div></td>
+      </tr>`;
+    });
+    h+=`</tbody></table></div></div>`;
+  });
+  c.innerHTML=h||'<p style="color:var(--gray-400);text-align:center;padding:60px">אין נתונים</p>';
+}
+
+// ========== PENDING ==========
+function renderPending() {
+  const c=document.getElementById('pendingList');
+  let items=[];
+  S.projects.forEach(p=>p.vendors.forEach(v=>v.invoices.forEach(inv=>{if(inv.currentStep<CHAIN.length)items.push({p,v,inv});})));
+  document.getElementById('pendingCount').textContent=items.length;
+  if(!items.length){c.innerHTML='<div style="text-align:center;padding:80px;color:var(--gray-400)"><p style="font-size:16px;font-weight:600">אין חשבונות ממתינים 🎉</p></div>';return;}
+  c.innerHTML=items.map(({p,v,inv})=>{
+    const step=CHAIN[inv.currentStep];
+    const hasFile = inv.file && inv.file !== 'null' && inv.file !== '';
+    const fileExt = hasFile ? inv.file.split('.').pop().toLowerCase() : '';
+    const isPdf   = fileExt === 'pdf';
+    const isImg   = ['jpg','jpeg','png','gif','webp'].includes(fileExt);
+    const isWord  = ['doc','docx'].includes(fileExt);
+
+    return `
+    <div style="background:var(--white);border-radius:14px;border:1px solid var(--gray-200);margin-bottom:16px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.04)">
+      <!-- Header row -->
+      <div style="padding:18px 24px 14px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;border-bottom:1px solid var(--gray-100)">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--gray-400);margin-bottom:5px">${p.name} › ${v.name}</div>
+          <div style="font-size:17px;font-weight:800;color:var(--text)">חשבון ${inv.number} · ${inv.month}</div>
+          <div style="display:flex;gap:20px;margin-top:8px;flex-wrap:wrap">
+            <div style="font-size:13px;color:var(--gray-600)">מוגש: <strong style="color:var(--text)">₪${N(inv.submitted)}</strong></div>
+            <div style="font-size:13px;color:var(--gray-600)">מאושר: <strong style="color:var(--success)">₪${N(inv.approved)}</strong></div>
+            <div style="font-size:13px;color:var(--gray-600)">ספק: <strong style="color:var(--text)">${v.name}</strong></div>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <span class="badge badge-step">⏳ שלב ${inv.currentStep+1}/3: ${step.label}</span>
+            ${hasFile ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--gray-600);background:var(--gray-100);padding:3px 10px;border-radius:20px">
+              📎 ${inv.file}
+            </span>` : '<span style="font-size:12px;color:var(--gray-400)">⚠ לא צורף קובץ</span>'}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0">
+          <button class="btn btn-gold" onclick="navSign('${p.id}','${v.id}','${inv.id}')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:16px;height:16px"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            חתום עכשיו
+          </button>
+          ${hasFile ? `<button class="btn btn-outline btn-sm" onclick="toggleFilePreview('prev_${inv.id}')">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            צפה במסמך
+          </button>` : ''}
+        </div>
+      </div>
+
+      <!-- File preview panel (collapsed by default) -->
+      ${hasFile ? `
+      <div id="prev_${inv.id}" style="display:none;border-top:1px solid var(--gray-100);background:var(--gray-50)">
+        <div style="padding:16px 24px">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:12px">📄 תצוגה מקדימה: ${inv.file}</div>
+          ${isPdf ? `
+          <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;height:500px">
+            <div style="padding:40px;text-align:center;color:var(--gray-400)">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:#e53e3e;margin-bottom:12px"><path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 9.5h1v-1H9v1zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm10 5.5h1v-3h-1v3z"/></svg>
+              <p style="font-size:14px;font-weight:600;margin-bottom:6px">קובץ PDF: ${inv.file}</p>
+              <p style="font-size:12px;margin-bottom:16px">לצפייה מלאה בקובץ, יש להוריד אותו מהמערכת</p>
+              <div style="display:inline-flex;align-items:center;gap:6px;padding:8px 18px;background:#e53e3e;color:white;border-radius:8px;font-size:13px;font-weight:600">
+                📥 הקובץ שמור במערכת — ${inv.file}
+              </div>
+            </div>
+          </div>` : isImg ? `
+          <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;overflow:hidden;text-align:center;padding:20px">
+            <div style="font-size:13px;color:var(--gray-400);margin-bottom:8px">📷 קובץ תמונה: ${inv.file}</div>
+            <div style="background:var(--gray-50);border-radius:8px;padding:40px;color:var(--gray-400)">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="margin-bottom:10px;opacity:.4"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <p style="font-size:13px">התמונה שמורה במערכת: ${inv.file}</p>
+            </div>
+          </div>` : isWord ? `
+          <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:10px;padding:40px;text-align:center;color:var(--gray-400)">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" style="color:#2b579a;margin-bottom:12px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 1.5L18.5 9H13V3.5z"/></svg>
+            <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:6px">מסמך Word: ${inv.file}</p>
+            <p style="font-size:12px">הקובץ שמור במערכת ומצורף לחשבון</p>
+          </div>` : `
+          <div style="padding:20px;text-align:center;color:var(--gray-400)">📎 קובץ מצורף: ${inv.file}</div>`}
+
+          <!-- Approval chain mini view -->
+          <div style="margin-top:16px;padding:14px 16px;background:var(--white);border:1px solid var(--gray-200);border-radius:10px">
+            <div style="font-size:12px;font-weight:700;color:var(--gray-600);margin-bottom:10px">שרשרת אישורים:</div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${CHAIN.map((ch,i)=>{
+                const ci=inv.chain[i]||{status:'pending'};
+                const bg=ci.status==='done'?'var(--success)':ci.status==='active'?'var(--gold)':'var(--gray-200)';
+                const col=ci.status==='pending'?'var(--gray-400)':'white';
+                return `<div style="display:flex;align-items:center;gap:4px">
+                  <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;background:${bg};color:${col};border-radius:20px;font-size:12px;font-weight:600">
+                    ${ci.status==='done'?'✓':ci.status==='active'?'⏳':String(i+1)} ${ch.label}
+                    ${ci.status==='done'&&ci.signerName?`<span style="font-weight:400;opacity:.85">— ${ci.signerName}</span>`:''}
+                  </div>
+                  ${i<CHAIN.length-1?'<span style="color:var(--gray-300)">→</span>':''}
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleFilePreview(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+// ========== SETTINGS ==========
+function renderSettings() {
+  // ---- Chain editor ----
+  const chainEl = document.getElementById('chainEditorList');
+  if (chainEl) {
+    chainEl.innerHTML = CHAIN.map((step, i) => `
+      <div id="chainItem_${i}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200);margin-bottom:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+        <div style="font-size:18px">${step.icon}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${step.label}</div>
+          <div style="font-size:11px;color:var(--gray-400)">${step.name}</div>
+        </div>
+        <input type="email" value="${step.email}"
+          style="padding:7px 10px;font-family:Heebo,sans-serif;font-size:12px;border:1.5px solid var(--gray-200);border-radius:8px;outline:none;width:190px;direction:ltr"
+          onchange="CHAIN[${i}].email=this.value" />
+        <div style="display:flex;flex-direction:column;gap:4px">
+          ${i > 0 ? `<button onclick="moveChainStep(${i},-1)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px" title="הזז למעלה">⬆</button>` : '<span style="width:22px"></span>'}
+          ${i < CHAIN.length-1 ? `<button onclick="moveChainStep(${i},1)" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px" title="הזז למטה">⬇</button>` : '<span style="width:22px"></span>'}
+        </div>
+        ${CHAIN.length > 1 ? `<button onclick="removeChainStep(${i})" style="background:#fff0f0;border:1px solid #fdd;color:var(--error);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:12px;font-weight:700" title="הסר">✕</button>` : ''}
+      </div>`).join('');
+  }
+
+  // ---- Populate "add from pool" dropdown ----
+  const addSel = document.getElementById('addChainUser');
+  if (addSel) {
+    const chainEmails = CHAIN.map(c => c.email);
+    addSel.innerHTML = '<option value="">— בחר משתמש —</option>' +
+      S.users.filter(u => !chainEmails.includes(u.email))
+              .map(u => `<option value="${u.id}">${u.icon} ${u.name} — ${u.role}</option>`).join('');
+  }
+
+  // ---- User pool ----
+  const poolEl = document.getElementById('userPoolList');
+  if (poolEl) {
+    poolEl.innerHTML = S.users.map((u,i) => {
+      const inChain = CHAIN.some(c => c.email === u.email);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:${inChain?'rgba(201,168,76,.08)':'var(--gray-50)'};border-radius:8px;border:1px solid ${inChain?'rgba(201,168,76,.3)':'var(--gray-200)'};margin-bottom:7px">
+        <div style="font-size:20px">${u.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">${u.name}</div>
+          <div style="font-size:11px;color:var(--gray-400)">${u.role} · ${u.email}</div>
+        </div>
+        ${inChain ? '<span style="font-size:11px;font-weight:700;color:var(--gold);background:rgba(201,168,76,.15);padding:2px 8px;border-radius:10px">בשרשרת ✓</span>' :
+          `<button onclick="addUserToChainDirectly('${u.id}')" style="background:var(--navy);color:white;border:none;border-radius:6px;padding:5px 10px;cursor:pointer;font-family:Heebo,sans-serif;font-size:12px;font-weight:600">+ לשרשרת</button>`}
+        <button onclick="removeUser(${i})" style="background:#fff0f0;border:1px solid #fdd;color:var(--error);border-radius:6px;padding:5px 8px;cursor:pointer;font-size:11px;font-weight:700" title="הסר ממאגר">🗑</button>
+      </div>`;
+    }).join('') || '<p style="color:var(--gray-400);font-size:13px;text-align:center;padding:20px">אין משתמשים במאגר</p>';
+  }
+
+  // ---- Email provider ----
+  const isOutlook = EMAIL_PROVIDER === 'outlook';
+  const epEl = document.getElementById('emailProviderSection');
+  if (epEl) {
+    epEl.innerHTML = `
+      <div style="display:flex;gap:12px;margin-bottom:16px">
+        <div onclick="setEmailProvider('gmail')" style="flex:1;padding:14px;border-radius:12px;border:2px solid ${!isOutlook?'#d93025':'var(--gray-200)'};background:${!isOutlook?'#fff3f3':'var(--white)'};cursor:pointer;transition:all .2s;text-align:center">
+          <div style="font-size:26px;margin-bottom:5px">📧</div>
+          <div style="font-weight:700;font-size:14px;color:${!isOutlook?'#d93025':'var(--text)'}">Gmail</div>
+          <div style="font-size:11px;color:var(--gray-400)">Google Workspace</div>
+          ${!isOutlook?'<div style="margin-top:6px;font-size:11px;font-weight:700;color:#d93025">✓ פעיל</div>':''}
+        </div>
+        <div onclick="setEmailProvider('outlook')" style="flex:1;padding:14px;border-radius:12px;border:2px solid ${isOutlook?'#0078d4':'var(--gray-200)'};background:${isOutlook?'#f0f7ff':'var(--white)'};cursor:pointer;transition:all .2s;text-align:center">
+          <div style="font-size:26px;margin-bottom:5px">📨</div>
+          <div style="font-weight:700;font-size:14px;color:${isOutlook?'#0078d4':'var(--text)'}">Outlook</div>
+          <div style="font-size:11px;color:var(--gray-400)">Microsoft 365</div>
+          ${isOutlook?'<div style="margin-top:6px;font-size:11px;font-weight:700;color:#0078d4">✓ פעיל</div>':''}
+        </div>
+      </div>
+      <div style="background:${isOutlook?'#f0f7ff':'#fff3f3'};border:1px solid ${isOutlook?'#c3daf5':'#fcc'};border-radius:8px;padding:11px 14px;font-size:12px;color:${isOutlook?'#1a3a5c':'#7a1a1a'}">
+        ${isOutlook?'📨 <strong>Outlook MCP</strong> — שליחה דרך Microsoft 365. ודא שחיבור Outlook מופעל ב-Claude.':
+                    '📧 <strong>Gmail MCP</strong> — שליחה דרך Google. ודא שחיבור Gmail מופעל ב-Claude.'}
+      </div>`;
+  }
+}
+
+// ---- Chain manipulation ----
+function moveChainStep(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= CHAIN.length) return;
+  [CHAIN[i], CHAIN[j]] = [CHAIN[j], CHAIN[i]];
+  renderSettings();
+  toast('סדר השרשרת עודכן');
+}
+
+function removeChainStep(i) {
+  if (CHAIN.length <= 1) { toast('חייב להיות לפחות חותם אחד','error'); return; }
+  CHAIN.splice(i, 1);
+  renderSettings();
+  toast('חותם הוסר מהשרשרת');
+}
+
+function addToChain() {
+  const sel = document.getElementById('addChainUser');
+  const uid = sel.value;
+  if (!uid) return;
+  const user = S.users.find(u => u.id === uid);
+  if (!user) return;
+  CHAIN.push({ id: user.id, label: user.role, icon: user.icon, email: user.email, name: user.name });
+  renderSettings();
+  toast(`✅ ${user.name} נוסף לשרשרת`);
+}
+
+function addUserToChainDirectly(uid) {
+  const user = S.users.find(u => u.id === uid);
+  if (!user) return;
+  if (CHAIN.some(c => c.email === user.email)) { toast('המשתמש כבר בשרשרת','error'); return; }
+  CHAIN.push({ id: user.id, label: user.role, icon: user.icon, email: user.email, name: user.name });
+  renderSettings();
+  toast(`✅ ${user.name} נוסף לשרשרת`);
+}
+
+function addUser() {
+  const name  = document.getElementById('fUserName').value.trim();
+  const role  = document.getElementById('fUserRole').value.trim();
+  const email = document.getElementById('fUserEmail').value.trim();
+  if (!name || !email) { toast('שם ומייל הם שדות חובה','error'); return; }
+  const icons = ['👤','👷','🏗️','💼','📊','🏛️','📋','✅'];
+  S.users.push({ id:'u_'+Date.now(), name, role: role||'משתמש', email, icon: icons[S.users.length % icons.length] });
+  ['fUserName','fUserRole','fUserEmail'].forEach(id => document.getElementById(id).value='');
+  renderSettings();
+  toast(`✅ ${name} נוסף למאגר`);
+}
+
+function removeUser(i) {
+  const u = S.users[i];
+  if (CHAIN.some(c => c.email === u.email)) { toast('לא ניתן להסיר — המשתמש נמצא בשרשרת הפעילה','error'); return; }
+  S.users.splice(i,1);
+  renderSettings();
+  toast('משתמש הוסר מהמאגר');
+}
+
+function setEmailProvider(p) { EMAIL_PROVIDER = p; renderSettings(); toast(`✅ ספק המייל שונה ל-${p==='outlook'?'Outlook':'Gmail'}`); }
+
+function saveSettings() {
+  const settingsPayload = {
+    emailProvider: EMAIL_PROVIDER,
+    pmEmail:       CHAIN[0]?.email || '',
+    vpEmail:       CHAIN[1]?.email || '',
+    financeEmail:  CHAIN[2]?.email || ''
+  };
+  saveToSheets('saveSettings', { settings: settingsPayload }, () => {
+    toast('✅ הגדרות נשמרו בגיליון');
+  });
+}
+
+// ========== EXCEL EXPORT (SheetJS) ==========
+function exportExcel() {
+  // Dynamically load SheetJS
+  if (typeof XLSX === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = () => doExport();
+    document.head.appendChild(s);
+  } else { doExport(); }
+}
+
+function doExport() {
+  const wb = XLSX.utils.book_new();
+  const MONTHS = ["ינואר 26","פברואר 26","מרץ 26","אפריל 26","מאי 26","יוני 26",
+                  "יולי 26","אוגוסט 26","ספטמבר 26","אוקטובר 26","נובמבר 26","דצמבר 26"];
+
+  /* ── Sheet 1: Summary ── */
+  const summaryRows = [
+    ["פרויקט","ספק","תחום","ח.פ","סכום הסכם","סה\"כ מוגש","סה\"כ מאושר","יתרה","% נוצל","מס' חשבונות","הצמדה","סטטוס"]
+  ];
+  let totContract=0, totSubmit=0, totApproved=0;
+  S.projects.forEach(p => {
+    p.vendors.forEach(v => {
+      const submitted = v.invoices.reduce((s,i)=>s+(i.submitted||0),0);
+      const approved  = v.invoices.reduce((s,i)=>s+(i.approved||0),0);
+      const remaining = v.amount - approved;
+      const pctVal    = v.amount > 0 ? +(approved/v.amount).toFixed(4) : 0;
+      const done      = v.invoices.filter(i=>i.currentStep>=3).length;
+      totContract += v.amount; totSubmit += submitted; totApproved += approved;
+      summaryRows.push([
+        p.name, v.name, v.domain, v.taxId,
+        v.amount, submitted, approved, remaining, pctVal,
+        v.invoices.length,
+        v.indexType==='indexed'?`מוצמד (בסיס ${v.indexBase})`:'לא מוצמד',
+        done===v.invoices.length && v.invoices.length>0 ? 'הושלם' : `${done}/${v.invoices.length} אושרו`
+      ]);
+    });
+  });
+  summaryRows.push(["","","","","סה\"כ",totSubmit,totApproved,totContract-totApproved,totApproved/totContract||0,"","",""]);
+
+  const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows);
+  // Column widths
+  wsSummary['!cols'] = [22,28,16,13,15,15,15,15,10,12,20,14].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsSummary, 'סיכום כללי');
+
+  /* ── Sheet 2: All Invoices ── */
+  const allRows = [
+    ["פרויקט","ספק","חשבון #","חודש","סכום מוגש","סכום מאושר","הפרש","% אישור",
+     "מצטבר ספק","% מהסכם","שלב נוכחי","סטטוס","קובץ"]
+  ];
+  S.projects.forEach(p => {
+    p.vendors.forEach(v => {
+      let cum = 0;
+      const sorted = [...v.invoices].sort((a,b) => {
+        const ai=MONTHS.indexOf(a.month), bi=MONTHS.indexOf(b.month);
+        return (ai===-1?99:ai)-(bi===-1?99:bi);
+      });
+      sorted.forEach(inv => {
+        cum += inv.approved||0;
+        const diff = (inv.approved||0)-(inv.submitted||0);
+        const pctAppr = inv.submitted>0 ? +(inv.approved/inv.submitted).toFixed(4) : 0;
+        const pctCont = v.amount>0 ? +(cum/v.amount).toFixed(4) : 0;
+        const stepLbl = inv.currentStep>=3 ? 'הושלם' : `שלב ${inv.currentStep+1}: ${CHAIN[Math.min(inv.currentStep,2)].label}`;
+        const status  = inv.currentStep>=3 ? 'חתום ומאושר' : 'בתהליך אישור';
+        allRows.push([
+          p.name, v.name, inv.number, inv.month,
+          inv.submitted||0, inv.approved||0, diff, pctAppr,
+          cum, pctCont, stepLbl, status, inv.file||'—'
+        ]);
+      });
+    });
+  });
+  const wsAll = XLSX.utils.aoa_to_sheet(allRows);
+  wsAll['!cols'] = [20,26,9,13,14,14,13,10,15,10,22,14,16].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, wsAll, 'כל החשבונות');
+
+  /* ── Sheet per vendor ── */
+  S.projects.forEach(p => {
+    p.vendors.forEach(v => {
+      const sheetName = (v.name.substring(0,22)+' ('+p.name.substring(0,8)+')').replace(/[:\\\/\?\*\[\]]/g,'_');
+      const rows = [
+        [`דוח ספק: ${v.name}`],[`פרויקט: ${p.name}`],[`תחום: ${v.domain}  ·  ח.פ: ${v.taxId}`],
+        [`סכום הסכם: ₪${N(v.amount)}  ·  הצמדה: ${v.indexType==='indexed'?`מוצמד (${v.indexBase})`:'לא מוצמד'}`],
+        [],
+        ["חשבון #","חודש","סכום מוגש","סכום מאושר","הפרש","% אישור","מצטבר מאושר","% מהסכם","שלב","סטטוס","קובץ"]
+      ];
+      let cum2=0;
+      const sorted2 = [...v.invoices].sort((a,b)=>(MONTHS.indexOf(a.month)||99)-(MONTHS.indexOf(b.month)||99));
+      sorted2.forEach(inv => {
+        cum2 += inv.approved||0;
+        const diff2   = (inv.approved||0)-(inv.submitted||0);
+        const pA      = inv.submitted>0 ? +(inv.approved/inv.submitted).toFixed(4) : 0;
+        const pC      = v.amount>0 ? +(cum2/v.amount).toFixed(4) : 0;
+        const stLbl   = inv.currentStep>=3 ? '✅ הושלם' : `⏳ ${CHAIN[Math.min(inv.currentStep,2)].label}`;
+        rows.push([inv.number, inv.month, inv.submitted||0, inv.approved||0,
+                   diff2, pA, cum2, pC, stLbl,
+                   inv.currentStep>=3?'חתום ומאושר':'בתהליך', inv.file||'—']);
+      });
+      // Totals
+      const totSub = v.invoices.reduce((s,i)=>s+(i.submitted||0),0);
+      const totApp = v.invoices.reduce((s,i)=>s+(i.approved||0),0);
+      rows.push(['סה"כ','', totSub, totApp, totApp-totSub,
+                 totSub>0?+(totApp/totSub).toFixed(4):0, totApp,
+                 v.amount>0?+(totApp/v.amount).toFixed(4):0,'','','']);
+      rows.push([]);
+      rows.push(['יתרה לתשלום','','',(v.amount-totApp),'','','','','','','']);
+
+      const wsV = XLSX.utils.aoa_to_sheet(rows);
+      wsV['!cols'] = [9,13,14,14,13,10,16,11,20,14,16].map(w=>({wch:w}));
+      // Freeze header row (row 6 = index 5)
+      wsV['!freeze'] = {xSplit:0, ySplit:6};
+      try { XLSX.utils.book_append_sheet(wb, wsV, sheetName.substring(0,31)); } catch(e) {}
+    });
+  });
+
+  const now = new Date();
+  const fname = `דוח_חשבונות_${pad(now.getDate())}-${pad(now.getMonth()+1)}-${now.getFullYear()}.xlsx`;
+  XLSX.writeFile(wb, fname);
+  toast('✅ קובץ Excel הורד בהצלחה!');
+}
+
+
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modalProject') populateCityDropdown();
+  if (id === 'modalInvoice') setTimeout(initInvChain, 50);
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function toast(msg,type=''){const t=document.getElementById('toast');document.getElementById('toastText').textContent=msg;t.className='toast show'+(type?' '+type:'');setTimeout(()=>t.classList.remove('show'),3500);}
+function N(n){return(n||0).toLocaleString('he-IL');}
+function pad(n){return String(n).padStart(2,'0');}
+function logout(){localStorage.removeItem('loggedUser');sessionStorage.removeItem('loggedUser');window.location.href='index.html';}
+
+document.addEventListener('click',e=>{
+  if(e.target.classList.contains('modal-overlay')) e.target.classList.remove('open');
+});
+
+window.addEventListener('load', async () => {
+  const u=localStorage.getItem('loggedUser')||sessionStorage.getItem('loggedUser');
+  const user=u?JSON.parse(u):{name:'מנהל מערכת',role:'admin',email:'admin@company.com'};
+  S.user=user;
+  document.getElementById('userName').textContent=user.name;
+  document.getElementById('userRole').textContent=user.role==='admin'?'מנהל מערכת':'משתמש';
+  document.getElementById('userAvatar').textContent=user.name.charAt(0);
+
+  // Try to load from Google Sheets
+  const loaded = await loadFromSheets();
+  if (!loaded) {
+    // Sheets not configured — show setup hint once
+    if (SHEETS_API_URL.includes('YOUR_APPS')) {
+      setTimeout(() => {
+        toast('💡 רץ במצב דמו — לחבר Google Sheets ראה מדריך הגדרה', '');
+      }, 1500);
+    }
+  }
+
+  renderProjects(); updateStats();
+});
+</script>
+</body>
+</html>
