@@ -656,7 +656,7 @@ let S = {
 //  GOOGLE SHEETS API LAYER
 //  החלף את הכתובת לאחר פרסום ה-Apps Script
 // ============================================================
-const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbxNjDuuZCEDJaNudXa2Y56D95A1edN7BGZWXI0yCSpkBW_Ns6tzUhijLNlcglFBHzgo2w/exec';
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbz9Y3wPjIn3QckmYIo8uUj7TTjnF72Hpi7W-oIIT_C9s5AtaTb1VSagqntGD22emdBB/exec';
 let DB_CONNECTED = false;  // true after successful connection
 
 // Core API call
@@ -1327,28 +1327,30 @@ async function addComment(invId) {
 }
 
 async function sendCommentAlert(inv,proj,vendor,commentText,recipient,at) {
-  const providerName=EMAIL_PROVIDER==='outlook'?'Outlook':'Gmail';
-  const mcpUrl=EMAIL_PROVIDER==='outlook'?OUTLOOK_MCP_URL:GMAIL_MCP_URL;
   const subject=`[הערה לחשבון] חשבון ${inv.number} — ${vendor.name} · ${proj.name}`;
-  const body=`שלום ${recipient.name},
-
-נוספה הערה לחשבון ${inv.number} (${inv.month}) של "${vendor.name}" בפרויקט "${proj.name}":
-
-"${commentText}"
-
-— ${S.user.name} · ${at}
-
-בברכה,
-מערכת אישור חשבונות`;
   try {
-    await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:300,
-        system:`Send email via ${providerName} MCP`,
-        messages:[{role:"user",content:`Send to ${recipient.email}, subject: ${subject}, body: ${body}`}],
-        mcp_servers:[{type:"url",url:mcpUrl,name:providerName.toLowerCase()+'-mcp'}]})});
+    const resp = await fetch(SHEETS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'sendComment',
+        to: recipient.email, toName: recipient.name,
+        commentText,
+        invoiceNumber: inv.number,
+        invoiceMonth:  inv.month,
+        vendorName:    vendor.name,
+        projectName:   proj.name,
+        fromUser:      S.user.name
+      })
+    });
+    const result = await resp.json();
     if (!inv.emailLog) inv.emailLog=[];
     inv.emailLog.push({to:recipient.email,at,subj:subject});
-  } catch(e){console.warn('Comment alert error:',e);}
+  } catch(e) {
+    console.warn('Comment alert error:',e);
+    if (!inv.emailLog) inv.emailLog=[];
+    inv.emailLog.push({to:recipient.email,at,subj:subject});
+  }
 }
 
 // ========== SIGN MODAL ==========
@@ -1427,34 +1429,44 @@ async function confirmSign() {
 }
 
 async function sendEmail(inv, proj, vendor, fromStep, toStep, at) {
-  const providerName = EMAIL_PROVIDER === 'outlook' ? 'Outlook' : 'Gmail';
-  const mcpUrl       = EMAIL_PROVIDER === 'outlook' ? OUTLOOK_MCP_URL : GMAIL_MCP_URL;
-  const mcpName      = EMAIL_PROVIDER === 'outlook' ? 'outlook-mcp' : 'gmail-mcp';
-
-  document.getElementById('emailModalTitle').textContent = `שולח מייל דרך ${providerName}...`;
-  document.getElementById('emailModalDesc').textContent  = `מכין מייל ל${toStep.name} (${toStep.email})`;
+  document.getElementById('emailModalTitle').textContent = `שולח מייל ל${toStep.name}...`;
+  document.getElementById('emailModalDesc').textContent  = `${toStep.email}`;
   document.getElementById('emailModalFooter').style.display = 'none';
   openModal('modalEmail');
 
   const subject = `[אישור חשבון] חשבון ${inv.number} — ${vendor.name} · ${proj.name} — ממתין לחתימתך`;
-  const body    = `שלום ${toStep.name},\n\nחשבון ${inv.number} לחודש ${inv.month} של ספק "${vendor.name}" בפרויקט "${proj.name}" ממתין לחתימתך.\n\nסכום מוגש: ₪${N(inv.submitted)}\nסכום מאושר: ₪${N(inv.approved)}\nשלב קודם אושר על ידי: ${fromStep.label} ב-${at}\n\nיש להיכנס למערכת ולאתר את החשבון תחת "ממתין לאישורי".\n\nבברכה,\nמערכת אישור חשבונות`;
 
   try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
+    const resp = await fetch(SHEETS_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:500,
-        system:`Send the email using ${providerName} MCP. Respond with JSON: {"sent":true}`,
-        messages:[{role:"user",content:`Send email to ${toStep.email}, subject: ${subject}, body: ${body}`}],
-        mcp_servers:[{type:"url", url: mcpUrl, name: mcpName}]
+        action: 'sendEmail',
+        to: toStep.email, toName: toStep.name,
+        subject,
+        invoiceId:     inv.id,
+        invoiceNumber: inv.number,
+        invoiceMonth:  inv.month,
+        vendorName:    vendor.name,
+        projectName:   proj.name,
+        submitted:     inv.submitted,
+        approved:      inv.approved,
+        fromStepLabel: fromStep.label,
+        fromSigner:    S.user.name,
+        signedAt:      at,
+        nextStepLabel: toStep.label
       })
     });
-    await resp.json();
-    logEmail(inv, toStep.email, at, subject, providerName);
-    showEmailSuccess(toStep, subject, at, true, providerName);
+    const result = await resp.json();
+    if (result.ok) {
+      logEmail(inv, toStep.email, at, subject, 'Gmail');
+      showEmailSuccess(toStep, subject, at, true, 'Gmail');
+    } else {
+      throw new Error(result.error);
+    }
   } catch(e) {
-    logEmail(inv, toStep.email, at, subject, providerName);
-    showEmailSuccess(toStep, subject, at, false, providerName);
+    logEmail(inv, toStep.email, at, subject, 'Gmail');
+    showEmailSuccess(toStep, subject, at, false, 'Gmail');
   }
 }
 
